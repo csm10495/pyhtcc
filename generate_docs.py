@@ -3,6 +3,7 @@ script to create docs
 '''
 
 import os
+import shutil
 import subprocess
 import sys
 
@@ -25,6 +26,15 @@ if __name__ == '__main__':
         '--html',
         'pyhtcc',
         '-o',
-        'docs',
+        'docs_tmp',
         '-f'
     ]) == 0, 'Unable to generate docs via pdoc'
+
+    # remove existing docs dir
+    shutil.rmtree('docs', ignore_errors=True)
+
+    # remove extra dir nesting and move back to docs/
+    shutil.move('docs_tmp/pyhtcc', 'docs')
+    os.rmdir('docs_tmp')
+
+
