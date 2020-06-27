@@ -37,7 +37,7 @@ def main():
         if 'PYHTCC_PASS' in os.environ:
             password = os.environ['PYHTCC_PASS']
         else:
-            raise ValueError("Must provide -up--password or have environment variable PYHTCC_PASS set")
+            raise ValueError("Must provide -p/--password or have environment variable PYHTCC_PASS set")
 
     pyhtcc = PyHTCC(user, password)
 
