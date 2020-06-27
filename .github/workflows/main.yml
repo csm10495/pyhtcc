@@ -26,6 +26,7 @@ jobs:
         cd $GITHUB_WORKSPACE
         ls
         python3 --version
+        sudo apt-get install python3-setuptools
         python3 generate_docs.py
         git add docs/*
         git commit -a -m "Updating docs"
