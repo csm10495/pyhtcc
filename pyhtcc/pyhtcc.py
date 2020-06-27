@@ -57,6 +57,9 @@ class Zone:
 
         raise ZoneNotFoundError(f"Missing device: {self.device_id}")
 
+    def get_name(self) -> str:
+        return self.zone_info['Name']
+
     def get_current_temperature_raw(self) -> int:
         self.refresh_zone_info()
         if self.zone_info['DispTempAvailable']:
@@ -90,7 +93,7 @@ class Zone:
     def submit_control_changes(self, data:dict) -> None:
         return self.pyhtcc.submit_raw_control_changes(self.device_id, data)
 
-    def set_permananent_cool_temperature(self, temp:int) -> None:
+    def set_permananent_cool_setpoint(self, temp:int) -> None:
         logger.info(f"setting cool on with a target temp of: {temp}")
         return self.submit_control_changes({
             'CoolSetpoint' : temp,
@@ -99,7 +102,7 @@ class Zone:
             'SystemSwitch' : 3
         })
 
-    def set_permananent_heat_temperature(self, temp:int) -> None:
+    def set_permananent_heat_setpoint(self, temp:int) -> None:
         logger.info(f"setting heat on with a target temp of: {temp}")
         return self.submit_control_changes({
             'HeatSetpoint' : temp,
