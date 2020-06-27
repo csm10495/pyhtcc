@@ -21,8 +21,10 @@ See [https://csm10495.github.io/pyhtcc/](https://csm10495.github.io/pyhtcc/) for
 # CLI Syntax
 
 
+
 [CLI_OUTPUT_MARKER]::
 
+```
 usage: pyhtcc [-h] [-u USER] [-p PASSWORD] [-n NAME] [-s] [-d]
               [-H HEAT | -C COOL]
 
@@ -43,7 +45,9 @@ optional arguments:
   -H HEAT, --heat HEAT  Set a target heat temperature
   -C COOL, --cool COOL  Set a target cooling temperature
 
+```
 [CLI_OUTPUT_MARKER]::
+
 
 
 ## License
