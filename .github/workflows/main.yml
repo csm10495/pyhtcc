@@ -28,7 +28,7 @@ jobs:
         python3 --version
         sudo apt-get install python3-setuptools
         python3 -m pip install .
-        python3 generate_docs.py
+        sudo python3 generate_docs.py
         git add docs/*
         git commit -a -m "Updating docs"
         git push
