@@ -32,7 +32,17 @@ class ZoneNotFoundError(EnvironmentError):
     pass
 
 class Zone:
+    '''
+    A Zone often equates to a given thermostat. The Zone object can be used to control the thermostat
+        for the given zone.
+    '''
+
     def __init__(self, device_id_or_zone_info:typing.Union[int, str], pyhtcc:typing.TypeVar("PyHTCC")):
+        '''
+        Initializer for a Zone object.
+        Takes in a device_id or zone info dict object as the first param.
+        Also takes in an authenticated instance of an PyHTCC object
+        '''
         if isinstance(device_id_or_zone_info, int):
             self.device_id = device_id_or_zone_info
             self.zone_info = {}
@@ -58,9 +68,11 @@ class Zone:
         raise ZoneNotFoundError(f"Missing device: {self.device_id}")
 
     def get_name(self) -> str:
+        ''' gets the name corresponding with this Zone '''
         return self.zone_info['Name']
 
     def get_current_temperature_raw(self) -> int:
+        ''' gets the current temperature via refreshing the cached zone information '''
         self.refresh_zone_info()
         if self.zone_info['DispTempAvailable']:
             return int(self.zone_info['DispTemp'])
@@ -68,32 +80,45 @@ class Zone:
         raise KeyError("Temperature is unavailable")
 
     def get_current_temperature(self) -> str:
+        ''' calls get_current_temperature_raw() then adds on a degree sign and the display unit '''
         raw = self.get_current_temperature_raw()
         disp_unit = self.zone_info['DispUnits']
         return f'{raw}°{disp_unit}'
 
     def get_raw_heat_setpoint(self) -> int:
+        ''' refreshes the cached zone information then returns the heat setpoint '''
         self.refresh_zone_info()
         return int(self.zone_info['latestData']['uiData']['HeatSetpoint'])
 
     def get_raw_cool_setpoint(self) -> int:
+        ''' refreshes the cached zone information then returns the cool setpoint '''
         self.refresh_zone_info()
         return int(self.zone_info['latestData']['uiData']['CoolSetpoint'])
 
     def get_heat_setpoint(self) -> str:
+        ''' calls get_raw_heat_setpoint() then adds on a degree sign and the display unit '''
         raw = self.get_raw_heat_setpoint()
         disp_unit = self.zone_info['DispUnits']
         return f'{raw}°{disp_unit}'
 
     def get_cool_setpoint(self) -> str:
+        ''' calls get_raw_cool_setpoint() then adds on a degree sign and the display unit '''
         raw = self.get_raw_cool_setpoint()
         disp_unit = self.zone_info['DispUnits']
         return f'{raw}°{disp_unit}'
 
     def submit_control_changes(self, data:dict) -> None:
+        '''
+        This is a low-level API call to PyHTCC.submit_raw_control_changes().
+        More likely than not, most users need not use this call directly.
+        '''
         return self.pyhtcc.submit_raw_control_changes(self.device_id, data)
 
     def set_permananent_cool_setpoint(self, temp:int) -> None:
+        '''
+        Sets a new permananet cool setpoint.
+        This will also attempt to turn the thermostat to 'Cool'
+        '''
         logger.info(f"setting cool on with a target temp of: {temp}")
         return self.submit_control_changes({
             'CoolSetpoint' : temp,
@@ -103,6 +128,10 @@ class Zone:
         })
 
     def set_permananent_heat_setpoint(self, temp:int) -> None:
+        '''
+        Sets a new permananet heat setpoint.
+        This will also attempt to turn the thermostat to 'Heat'
+        '''
         logger.info(f"setting heat on with a target temp of: {temp}")
         return self.submit_control_changes({
             'HeatSetpoint' : temp,
@@ -112,24 +141,28 @@ class Zone:
         })
 
     def turn_system_off(self) -> None:
+        ''' turns this thermostat off '''
         logger.info("turning system off")
         return self.submit_control_changes({
             'SystemSwitch' : 2,
         })
 
     def turn_fan_on(self) -> None:
+        ''' turns the fan on '''
         logger.info("turning fan on")
         return self.submit_control_changes({
             'FanMode' : 1,
         })
 
     def turn_fan_auto(self) -> None:
+        ''' turns the fan to auto '''
         logger.info("turning fan to auto")
         return self.submit_control_changes({
             'FanMode' : 0,
         })
 
     def turn_fan_circulate(self) -> None:
+        ''' turns the fan to circulate '''
         logger.info("turning fan circulate")
         return self.submit_control_changes({
             'FanMode' : 2,
@@ -141,6 +174,9 @@ class PyHTCC:
     Class that represents a Python object to control a Honeywell Total Connect Comfort thermostat system
     '''
     def __init__(self, username:str, password:str):
+        '''
+        Initializer for the PyHTCC object. Will save username and password, then call authenticate().
+        '''
         self.username = username
         self.password = password
         self._locationId = None
@@ -152,6 +188,13 @@ class PyHTCC:
         self.authenticate()
 
     def authenticate(self) -> None:
+        '''
+        Attempts to authenticate with mytotalconnectcomfort.com.
+        Internally this will do exponential backoff if the portal rejects our sign on request.
+
+        Note that the portal does have rate-limiting. This will attempt to retry with increasingly-long
+            sleep intervals if rate-limiting is preventing sign-on.
+        '''
         for i in range(100):
             logger.debug(f"Starting authentication attempt #{i + 1}")
             try:
@@ -165,6 +208,12 @@ class PyHTCC:
         raise AuthenticationError("Unable to authenticate. Ran out of tries")
 
     def _do_authenticate(self) -> None:
+        '''
+        Attempts to perform the actual authentication.
+        Will set: self.session and self._locationId
+
+        Can raise various exceptions. Users are expected to use authenticate() instead of this method.
+        '''
         self.session = requests.session()
         self.session.auth = (self.username, self.password)
 
@@ -190,6 +239,12 @@ class PyHTCC:
         logger.debug(f"location id is {self._locationId}")
 
     def _get_name_for_device_id(self, device_id:int) -> str:
+        '''
+        Will ask via the api for the name corresponding with the device id.
+        Note that this actually greps the html for the name.
+        Note that this will only perform an HTTP request if we don't already have this device_id's name cached
+        '''
+
         if device_id not in self._device_id_to_name:
             # grab the name from the portal
             result = self.session.get(f'https://www.mytotalconnectcomfort.com/portal/Device/Control/{device_id}?page=1')
@@ -201,6 +256,9 @@ class PyHTCC:
         return self._device_id_to_name[device_id]
 
     def get_zones_info(self) -> list:
+        '''
+        Returns a list of dicts corresponding with each one corresponding to a particular zone.
+        '''
         zones = []
         for page_num in range(1, 6):
             logger.debug(f"Attempting to get zones for location id, page: {self._locationId}, {page_num}")
@@ -239,9 +297,15 @@ class PyHTCC:
         return zones
 
     def get_all_zones(self) -> list:
+        '''
+        Returns a list of Zone objects, corresponding with an object per zone on the account.
+        '''
         return [Zone(a, self) for a in self.get_zones_info()]
 
     def get_zone_by_name(self, name) -> Zone:
+        '''
+        Will grab a Zone object for the given device name (not device id)
+        '''
         zone_info = self.get_zones_info()
         for a in zone_info:
             if a['Name'] == name:
@@ -252,8 +316,7 @@ class PyHTCC:
     def submit_raw_control_changes(self, device_id:int, other_data:dict) -> None:
         '''
         Simulates making changes to current thermostat settings in the UI via
-        the SubmitControlScreenChanges/ endpoint.
-
+        the SubmitControlScreenChanges/ endpoint.\
         '''
         # None seems to mean no change to this control
         data = {
