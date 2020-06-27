@@ -8,7 +8,7 @@ import pprint
 from .pyhtcc import PyHTCC, Zone, enableConsoleLogging
 
 def main():
-    parser = argparse.ArgumentParser(description='A CLI to perform actions on a Honeywell Total Comfort Connect thermostat system')
+    parser = argparse.ArgumentParser('pyhtcc', description='A CLI to perform actions on a Honeywell Total Comfort Connect thermostat system')
     parser.add_argument('-u', '--user', type=str, help='Username to login to TCC. If not given uses the environment variable PYHTCC_EMAIL')
     parser.add_argument('-p', '--password', type=str, help='Password to login to TCC. If not given uses the environment variable PYHTCC_PASS')
     parser.add_argument('-n', '--name', type=str, help='Thermostat name to target. If not given, targets all zones')

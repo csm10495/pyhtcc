@@ -35,5 +35,6 @@ jobs:
         git config user.email "<>"
 
         git add docs/* || true
+        git add README.md || true
         git commit -a -m "Updating docs" || true
         git push origin master || true

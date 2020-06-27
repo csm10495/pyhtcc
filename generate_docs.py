@@ -37,4 +37,16 @@ if __name__ == '__main__':
     shutil.move('docs_tmp/pyhtcc', 'docs')
     os.rmdir('docs_tmp')
 
+    help_output = subprocess.check_output(sys.executable + ' -m pyhtcc --help', shell=True).decode()
 
+    with open('README.md', 'r') as f:
+        readme_txt = f.read()
+
+    CLI_MARKER = '[CLI_OUTPUT_MARKER]::'
+
+    pre_cli_help, _, post_cli_help = readme_txt.split(CLI_MARKER)
+
+    new_readme = pre_cli_help + '\n' + CLI_MARKER + '\n\n' + help_output + '\n' + CLI_MARKER + '\n' + post_cli_help
+
+    with open('README.md', 'w') as f:
+        f.write(new_readme)
