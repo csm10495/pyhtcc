@@ -12,6 +12,7 @@ if __name__ == '__main__':
         '-m',
         'pip',
         'install',
+        'setuptools',
         'pdoc3',
     ]) == 0, 'Unable to install pdoc3'
 
