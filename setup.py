@@ -22,7 +22,7 @@ setup(
     url='http://github.com/csm10495/pyhtcc',
     version=getVersion(),
     packages=['pyhtcc'],
-    license='No distribution intended',
+    license='MIT License',
     python_requires='>=3,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*',
     long_description=open(os.path.join(os.path.dirname(__file__), 'README.md')).read(),
     long_description_content_type="text/markdown",
