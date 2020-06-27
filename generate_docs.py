@@ -46,7 +46,7 @@ if __name__ == '__main__':
 
     pre_cli_help, _, post_cli_help = readme_txt.split(CLI_MARKER)
 
-    new_readme = pre_cli_help + '\n' + CLI_MARKER + '\n\n' + help_output + '\n' + CLI_MARKER + '\n' + post_cli_help
+    new_readme = pre_cli_help + '\n' + CLI_MARKER + '\n\n```\n' + help_output + '\n```\n' + CLI_MARKER + '\n' + post_cli_help
 
     with open('README.md', 'w') as f:
         f.write(new_readme)
