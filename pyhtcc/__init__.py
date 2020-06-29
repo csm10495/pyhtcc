@@ -1,3 +1,3 @@
 from .pyhtcc import *
 
-__version__ = "0.0.1b"
+__version__ = "0.0.2"

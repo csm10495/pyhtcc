@@ -53,7 +53,7 @@ class Zone:
         self.pyhtcc = pyhtcc
 
         if not self.zone_info:
-            # will create populate self.zone_info
+            # will create/populate self.zone_info
             self.refresh_zone_info()
 
     def refresh_zone_info(self) -> None:
@@ -71,6 +71,11 @@ class Zone:
         ''' gets the name corresponding with this Zone '''
         return self.zone_info['Name']
 
+    def _get_with_unit(self, raw) -> str:
+        ''' takes the raw and adds a degree sign and a unit '''
+        disp_unit = self.zone_info['DispUnits']
+        return f'{raw}°{disp_unit}'
+
     def get_current_temperature_raw(self) -> int:
         ''' gets the current temperature via refreshing the cached zone information '''
         self.refresh_zone_info()
@@ -82,30 +87,37 @@ class Zone:
     def get_current_temperature(self) -> str:
         ''' calls get_current_temperature_raw() then adds on a degree sign and the display unit '''
         raw = self.get_current_temperature_raw()
-        disp_unit = self.zone_info['DispUnits']
-        return f'{raw}°{disp_unit}'
+        return self._get_with_unit(raw)
 
-    def get_raw_heat_setpoint(self) -> int:
+    def get_heat_setpoint_raw(self) -> int:
         ''' refreshes the cached zone information then returns the heat setpoint '''
         self.refresh_zone_info()
         return int(self.zone_info['latestData']['uiData']['HeatSetpoint'])
 
-    def get_raw_cool_setpoint(self) -> int:
+    def get_cool_setpoint_raw(self) -> int:
         ''' refreshes the cached zone information then returns the cool setpoint '''
         self.refresh_zone_info()
         return int(self.zone_info['latestData']['uiData']['CoolSetpoint'])
 
     def get_heat_setpoint(self) -> str:
-        ''' calls get_raw_heat_setpoint() then adds on a degree sign and the display unit '''
-        raw = self.get_raw_heat_setpoint()
-        disp_unit = self.zone_info['DispUnits']
-        return f'{raw}°{disp_unit}'
+        ''' calls get_heat_setpoint_raw() then adds on a degree sign and the display unit '''
+        raw = self.get_heat_setpoint_raw()
+        return self._get_with_unit(raw)
 
     def get_cool_setpoint(self) -> str:
-        ''' calls get_raw_cool_setpoint() then adds on a degree sign and the display unit '''
-        raw = self.get_raw_cool_setpoint()
-        disp_unit = self.zone_info['DispUnits']
-        return f'{raw}°{disp_unit}'
+        ''' calls get_cool_setpoint_raw() then adds on a degree sign and the display unit '''
+        raw = self.get_cool_setpoint_raw()
+        return self._get_with_unit(raw)
+
+    def get_outdoor_temperature_raw(self) -> int:
+        ''' refreshes the cached zone information then returns the outdoor temperature raw value '''
+        self.refresh_zone_info()
+        return self.zone_info['OutdoorTemperature']
+
+    def get_outdoor_temperature(self) -> str:
+        ''' calls get_outdoor_temperature_raw() then returns it with a degree sign and the display unit '''
+        raw = self.get_outdoor_temperature_raw()
+        return self._get_with_unit(raw)
 
     def submit_control_changes(self, data:dict) -> None:
         '''
@@ -255,6 +267,31 @@ class PyHTCC:
 
         return self._device_id_to_name[device_id]
 
+    def _get_outdoor_weather_info_for_zone(self, device_id:int) -> dict:
+        '''
+        Private API to find the outdoor information on one of the logged in pages
+        '''
+        result = self.session.get(f'https://www.mytotalconnectcomfort.com/portal/Device/Control/{device_id}?page=1')
+        result.raise_for_status()
+
+        text_data = result.text
+        try:
+            outdoor_temp = int(text_data.split('Control.Model.Property.outdoorTemp,')[1].split(')', 1)[0])
+        except:
+            logger.exception("Unable to find the outdoor temperature.")
+            outdoor_temp = None
+
+        try:
+            outdoor_humidity = int(text_data.split('Control.Model.Property.outdoorHumidity,')[1].split(')', 1)[0])
+        except:
+            logger.exception("Unable to find the outdoor humidity.")
+            outdoor_humidity = None
+
+        return {
+            'OutdoorTemperature' : outdoor_temp,
+            'OutdoorHumidity' : outdoor_humidity,
+        }
+
     def get_zones_info(self) -> list:
         '''
         Returns a list of dicts corresponding with each one corresponding to a particular zone.
@@ -292,7 +329,7 @@ class PyHTCC:
                 logger.exception("Unable to decode json data returned by CheckDataSession. Data was:\n {result.text}")
                 raise
 
-            zones[idx] = {**zone, **more_data}
+            zones[idx] = {**zone, **more_data, **self._get_outdoor_weather_info_for_zone(device_id)}
 
         return zones
 
