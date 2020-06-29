@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.8.2" />
+<meta name="generator" content="pdoc 0.8.3" />
 <title>pyhtcc.pyhtcc API documentation</title>
 <meta name="description" content="Holds implementation guts for PyHTCC" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
@@ -82,7 +82,7 @@ class Zone:
         self.pyhtcc = pyhtcc
 
         if not self.zone_info:
-            # will create populate self.zone_info
+            # will create/populate self.zone_info
             self.refresh_zone_info()
 
     def refresh_zone_info(self) -&gt; None:
@@ -100,6 +100,11 @@ class Zone:
         &#39;&#39;&#39; gets the name corresponding with this Zone &#39;&#39;&#39;
         return self.zone_info[&#39;Name&#39;]
 
+    def _get_with_unit(self, raw) -&gt; str:
+        &#39;&#39;&#39; takes the raw and adds a degree sign and a unit &#39;&#39;&#39;
+        disp_unit = self.zone_info[&#39;DispUnits&#39;]
+        return f&#39;{raw}°{disp_unit}&#39;
+
     def get_current_temperature_raw(self) -&gt; int:
         &#39;&#39;&#39; gets the current temperature via refreshing the cached zone information &#39;&#39;&#39;
         self.refresh_zone_info()
@@ -111,30 +116,37 @@ class Zone:
     def get_current_temperature(self) -&gt; str:
         &#39;&#39;&#39; calls get_current_temperature_raw() then adds on a degree sign and the display unit &#39;&#39;&#39;
         raw = self.get_current_temperature_raw()
-        disp_unit = self.zone_info[&#39;DispUnits&#39;]
-        return f&#39;{raw}°{disp_unit}&#39;
+        return self._get_with_unit(raw)
 
-    def get_raw_heat_setpoint(self) -&gt; int:
+    def get_heat_setpoint_raw(self) -&gt; int:
         &#39;&#39;&#39; refreshes the cached zone information then returns the heat setpoint &#39;&#39;&#39;
         self.refresh_zone_info()
         return int(self.zone_info[&#39;latestData&#39;][&#39;uiData&#39;][&#39;HeatSetpoint&#39;])
 
-    def get_raw_cool_setpoint(self) -&gt; int:
+    def get_cool_setpoint_raw(self) -&gt; int:
         &#39;&#39;&#39; refreshes the cached zone information then returns the cool setpoint &#39;&#39;&#39;
         self.refresh_zone_info()
         return int(self.zone_info[&#39;latestData&#39;][&#39;uiData&#39;][&#39;CoolSetpoint&#39;])
 
     def get_heat_setpoint(self) -&gt; str:
-        &#39;&#39;&#39; calls get_raw_heat_setpoint() then adds on a degree sign and the display unit &#39;&#39;&#39;
-        raw = self.get_raw_heat_setpoint()
-        disp_unit = self.zone_info[&#39;DispUnits&#39;]
-        return f&#39;{raw}°{disp_unit}&#39;
+        &#39;&#39;&#39; calls get_heat_setpoint_raw() then adds on a degree sign and the display unit &#39;&#39;&#39;
+        raw = self.get_heat_setpoint_raw()
+        return self._get_with_unit(raw)
 
     def get_cool_setpoint(self) -&gt; str:
-        &#39;&#39;&#39; calls get_raw_cool_setpoint() then adds on a degree sign and the display unit &#39;&#39;&#39;
-        raw = self.get_raw_cool_setpoint()
-        disp_unit = self.zone_info[&#39;DispUnits&#39;]
-        return f&#39;{raw}°{disp_unit}&#39;
+        &#39;&#39;&#39; calls get_cool_setpoint_raw() then adds on a degree sign and the display unit &#39;&#39;&#39;
+        raw = self.get_cool_setpoint_raw()
+        return self._get_with_unit(raw)
+
+    def get_outdoor_temperature_raw(self) -&gt; int:
+        &#39;&#39;&#39; refreshes the cached zone information then returns the outdoor temperature raw value &#39;&#39;&#39;
+        self.refresh_zone_info()
+        return self.zone_info[&#39;OutdoorTemperature&#39;]
+
+    def get_outdoor_temperature(self) -&gt; str:
+        &#39;&#39;&#39; calls get_outdoor_temperature_raw() then returns it with a degree sign and the display unit &#39;&#39;&#39;
+        raw = self.get_outdoor_temperature_raw()
+        return self._get_with_unit(raw)
 
     def submit_control_changes(self, data:dict) -&gt; None:
         &#39;&#39;&#39;
@@ -284,6 +296,31 @@ class PyHTCC:
 
         return self._device_id_to_name[device_id]
 
+    def _get_outdoor_weather_info_for_zone(self, device_id:int) -&gt; dict:
+        &#39;&#39;&#39;
+        Private API to find the outdoor information on one of the logged in pages
+        &#39;&#39;&#39;
+        result = self.session.get(f&#39;https://www.mytotalconnectcomfort.com/portal/Device/Control/{device_id}?page=1&#39;)
+        result.raise_for_status()
+
+        text_data = result.text
+        try:
+            outdoor_temp = int(text_data.split(&#39;Control.Model.Property.outdoorTemp,&#39;)[1].split(&#39;)&#39;, 1)[0])
+        except:
+            logger.exception(&#34;Unable to find the outdoor temperature.&#34;)
+            outdoor_temp = None
+
+        try:
+            outdoor_humidity = int(text_data.split(&#39;Control.Model.Property.outdoorHumidity,&#39;)[1].split(&#39;)&#39;, 1)[0])
+        except:
+            logger.exception(&#34;Unable to find the outdoor humidity.&#34;)
+            outdoor_humidity = None
+
+        return {
+            &#39;OutdoorTemperature&#39; : outdoor_temp,
+            &#39;OutdoorHumidity&#39; : outdoor_humidity,
+        }
+
     def get_zones_info(self) -&gt; list:
         &#39;&#39;&#39;
         Returns a list of dicts corresponding with each one corresponding to a particular zone.
@@ -321,7 +358,7 @@ class PyHTCC:
                 logger.exception(&#34;Unable to decode json data returned by CheckDataSession. Data was:\n {result.text}&#34;)
                 raise
 
-            zones[idx] = {**zone, **more_data}
+            zones[idx] = {**zone, **more_data, **self._get_outdoor_weather_info_for_zone(device_id)}
 
         return zones
 
@@ -509,6 +546,31 @@ if __name__ == &#39;__main__&#39;:
 
         return self._device_id_to_name[device_id]
 
+    def _get_outdoor_weather_info_for_zone(self, device_id:int) -&gt; dict:
+        &#39;&#39;&#39;
+        Private API to find the outdoor information on one of the logged in pages
+        &#39;&#39;&#39;
+        result = self.session.get(f&#39;https://www.mytotalconnectcomfort.com/portal/Device/Control/{device_id}?page=1&#39;)
+        result.raise_for_status()
+
+        text_data = result.text
+        try:
+            outdoor_temp = int(text_data.split(&#39;Control.Model.Property.outdoorTemp,&#39;)[1].split(&#39;)&#39;, 1)[0])
+        except:
+            logger.exception(&#34;Unable to find the outdoor temperature.&#34;)
+            outdoor_temp = None
+
+        try:
+            outdoor_humidity = int(text_data.split(&#39;Control.Model.Property.outdoorHumidity,&#39;)[1].split(&#39;)&#39;, 1)[0])
+        except:
+            logger.exception(&#34;Unable to find the outdoor humidity.&#34;)
+            outdoor_humidity = None
+
+        return {
+            &#39;OutdoorTemperature&#39; : outdoor_temp,
+            &#39;OutdoorHumidity&#39; : outdoor_humidity,
+        }
+
     def get_zones_info(self) -&gt; list:
         &#39;&#39;&#39;
         Returns a list of dicts corresponding with each one corresponding to a particular zone.
@@ -546,7 +608,7 @@ if __name__ == &#39;__main__&#39;:
                 logger.exception(&#34;Unable to decode json data returned by CheckDataSession. Data was:\n {result.text}&#34;)
                 raise
 
-            zones[idx] = {**zone, **more_data}
+            zones[idx] = {**zone, **more_data, **self._get_outdoor_weather_info_for_zone(device_id)}
 
         return zones
 
@@ -716,7 +778,7 @@ sleep intervals if rate-limiting is preventing sign-on.</p></div>
             logger.exception(&#34;Unable to decode json data returned by CheckDataSession. Data was:\n {result.text}&#34;)
             raise
 
-        zones[idx] = {**zone, **more_data}
+        zones[idx] = {**zone, **more_data, **self._get_outdoor_weather_info_for_zone(device_id)}
 
     return zones</code></pre>
 </details>
@@ -843,7 +905,7 @@ Also takes in an authenticated instance of an PyHTCC object</p></div>
         self.pyhtcc = pyhtcc
 
         if not self.zone_info:
-            # will create populate self.zone_info
+            # will create/populate self.zone_info
             self.refresh_zone_info()
 
     def refresh_zone_info(self) -&gt; None:
@@ -861,6 +923,11 @@ Also takes in an authenticated instance of an PyHTCC object</p></div>
         &#39;&#39;&#39; gets the name corresponding with this Zone &#39;&#39;&#39;
         return self.zone_info[&#39;Name&#39;]
 
+    def _get_with_unit(self, raw) -&gt; str:
+        &#39;&#39;&#39; takes the raw and adds a degree sign and a unit &#39;&#39;&#39;
+        disp_unit = self.zone_info[&#39;DispUnits&#39;]
+        return f&#39;{raw}°{disp_unit}&#39;
+
     def get_current_temperature_raw(self) -&gt; int:
         &#39;&#39;&#39; gets the current temperature via refreshing the cached zone information &#39;&#39;&#39;
         self.refresh_zone_info()
@@ -872,30 +939,37 @@ Also takes in an authenticated instance of an PyHTCC object</p></div>
     def get_current_temperature(self) -&gt; str:
         &#39;&#39;&#39; calls get_current_temperature_raw() then adds on a degree sign and the display unit &#39;&#39;&#39;
         raw = self.get_current_temperature_raw()
-        disp_unit = self.zone_info[&#39;DispUnits&#39;]
-        return f&#39;{raw}°{disp_unit}&#39;
+        return self._get_with_unit(raw)
 
-    def get_raw_heat_setpoint(self) -&gt; int:
+    def get_heat_setpoint_raw(self) -&gt; int:
         &#39;&#39;&#39; refreshes the cached zone information then returns the heat setpoint &#39;&#39;&#39;
         self.refresh_zone_info()
         return int(self.zone_info[&#39;latestData&#39;][&#39;uiData&#39;][&#39;HeatSetpoint&#39;])
 
-    def get_raw_cool_setpoint(self) -&gt; int:
+    def get_cool_setpoint_raw(self) -&gt; int:
         &#39;&#39;&#39; refreshes the cached zone information then returns the cool setpoint &#39;&#39;&#39;
         self.refresh_zone_info()
         return int(self.zone_info[&#39;latestData&#39;][&#39;uiData&#39;][&#39;CoolSetpoint&#39;])
 
     def get_heat_setpoint(self) -&gt; str:
-        &#39;&#39;&#39; calls get_raw_heat_setpoint() then adds on a degree sign and the display unit &#39;&#39;&#39;
-        raw = self.get_raw_heat_setpoint()
-        disp_unit = self.zone_info[&#39;DispUnits&#39;]
-        return f&#39;{raw}°{disp_unit}&#39;
+        &#39;&#39;&#39; calls get_heat_setpoint_raw() then adds on a degree sign and the display unit &#39;&#39;&#39;
+        raw = self.get_heat_setpoint_raw()
+        return self._get_with_unit(raw)
 
     def get_cool_setpoint(self) -&gt; str:
-        &#39;&#39;&#39; calls get_raw_cool_setpoint() then adds on a degree sign and the display unit &#39;&#39;&#39;
-        raw = self.get_raw_cool_setpoint()
-        disp_unit = self.zone_info[&#39;DispUnits&#39;]
-        return f&#39;{raw}°{disp_unit}&#39;
+        &#39;&#39;&#39; calls get_cool_setpoint_raw() then adds on a degree sign and the display unit &#39;&#39;&#39;
+        raw = self.get_cool_setpoint_raw()
+        return self._get_with_unit(raw)
+
+    def get_outdoor_temperature_raw(self) -&gt; int:
+        &#39;&#39;&#39; refreshes the cached zone information then returns the outdoor temperature raw value &#39;&#39;&#39;
+        self.refresh_zone_info()
+        return self.zone_info[&#39;OutdoorTemperature&#39;]
+
+    def get_outdoor_temperature(self) -&gt; str:
+        &#39;&#39;&#39; calls get_outdoor_temperature_raw() then returns it with a degree sign and the display unit &#39;&#39;&#39;
+        raw = self.get_outdoor_temperature_raw()
+        return self._get_with_unit(raw)
 
     def submit_control_changes(self, data:dict) -&gt; None:
         &#39;&#39;&#39;
@@ -964,16 +1038,30 @@ Also takes in an authenticated instance of an PyHTCC object</p></div>
 <span>def <span class="ident">get_cool_setpoint</span></span>(<span>self) ‑> str</span>
 </code></dt>
 <dd>
-<div class="desc"><p>calls get_raw_cool_setpoint() then adds on a degree sign and the display unit</p></div>
+<div class="desc"><p>calls get_cool_setpoint_raw() then adds on a degree sign and the display unit</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_cool_setpoint(self) -&gt; str:
-    &#39;&#39;&#39; calls get_raw_cool_setpoint() then adds on a degree sign and the display unit &#39;&#39;&#39;
-    raw = self.get_raw_cool_setpoint()
-    disp_unit = self.zone_info[&#39;DispUnits&#39;]
-    return f&#39;{raw}°{disp_unit}&#39;</code></pre>
+    &#39;&#39;&#39; calls get_cool_setpoint_raw() then adds on a degree sign and the display unit &#39;&#39;&#39;
+    raw = self.get_cool_setpoint_raw()
+    return self._get_with_unit(raw)</code></pre>
+</details>
+</dd>
+<dt id="pyhtcc.pyhtcc.Zone.get_cool_setpoint_raw"><code class="name flex">
+<span>def <span class="ident">get_cool_setpoint_raw</span></span>(<span>self) ‑> int</span>
+</code></dt>
+<dd>
+<div class="desc"><p>refreshes the cached zone information then returns the cool setpoint</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_cool_setpoint_raw(self) -&gt; int:
+    &#39;&#39;&#39; refreshes the cached zone information then returns the cool setpoint &#39;&#39;&#39;
+    self.refresh_zone_info()
+    return int(self.zone_info[&#39;latestData&#39;][&#39;uiData&#39;][&#39;CoolSetpoint&#39;])</code></pre>
 </details>
 </dd>
 <dt id="pyhtcc.pyhtcc.Zone.get_current_temperature"><code class="name flex">
@@ -988,8 +1076,7 @@ Also takes in an authenticated instance of an PyHTCC object</p></div>
 <pre><code class="python">def get_current_temperature(self) -&gt; str:
     &#39;&#39;&#39; calls get_current_temperature_raw() then adds on a degree sign and the display unit &#39;&#39;&#39;
     raw = self.get_current_temperature_raw()
-    disp_unit = self.zone_info[&#39;DispUnits&#39;]
-    return f&#39;{raw}°{disp_unit}&#39;</code></pre>
+    return self._get_with_unit(raw)</code></pre>
 </details>
 </dd>
 <dt id="pyhtcc.pyhtcc.Zone.get_current_temperature_raw"><code class="name flex">
@@ -1014,16 +1101,30 @@ Also takes in an authenticated instance of an PyHTCC object</p></div>
 <span>def <span class="ident">get_heat_setpoint</span></span>(<span>self) ‑> str</span>
 </code></dt>
 <dd>
-<div class="desc"><p>calls get_raw_heat_setpoint() then adds on a degree sign and the display unit</p></div>
+<div class="desc"><p>calls get_heat_setpoint_raw() then adds on a degree sign and the display unit</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_heat_setpoint(self) -&gt; str:
-    &#39;&#39;&#39; calls get_raw_heat_setpoint() then adds on a degree sign and the display unit &#39;&#39;&#39;
-    raw = self.get_raw_heat_setpoint()
-    disp_unit = self.zone_info[&#39;DispUnits&#39;]
-    return f&#39;{raw}°{disp_unit}&#39;</code></pre>
+    &#39;&#39;&#39; calls get_heat_setpoint_raw() then adds on a degree sign and the display unit &#39;&#39;&#39;
+    raw = self.get_heat_setpoint_raw()
+    return self._get_with_unit(raw)</code></pre>
+</details>
+</dd>
+<dt id="pyhtcc.pyhtcc.Zone.get_heat_setpoint_raw"><code class="name flex">
+<span>def <span class="ident">get_heat_setpoint_raw</span></span>(<span>self) ‑> int</span>
+</code></dt>
+<dd>
+<div class="desc"><p>refreshes the cached zone information then returns the heat setpoint</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_heat_setpoint_raw(self) -&gt; int:
+    &#39;&#39;&#39; refreshes the cached zone information then returns the heat setpoint &#39;&#39;&#39;
+    self.refresh_zone_info()
+    return int(self.zone_info[&#39;latestData&#39;][&#39;uiData&#39;][&#39;HeatSetpoint&#39;])</code></pre>
 </details>
 </dd>
 <dt id="pyhtcc.pyhtcc.Zone.get_name"><code class="name flex">
@@ -1040,34 +1141,34 @@ Also takes in an authenticated instance of an PyHTCC object</p></div>
     return self.zone_info[&#39;Name&#39;]</code></pre>
 </details>
 </dd>
-<dt id="pyhtcc.pyhtcc.Zone.get_raw_cool_setpoint"><code class="name flex">
-<span>def <span class="ident">get_raw_cool_setpoint</span></span>(<span>self) ‑> int</span>
+<dt id="pyhtcc.pyhtcc.Zone.get_outdoor_temperature"><code class="name flex">
+<span>def <span class="ident">get_outdoor_temperature</span></span>(<span>self) ‑> str</span>
 </code></dt>
 <dd>
-<div class="desc"><p>refreshes the cached zone information then returns the cool setpoint</p></div>
+<div class="desc"><p>calls get_outdoor_temperature_raw() then returns it with a degree sign and the display unit</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_raw_cool_setpoint(self) -&gt; int:
-    &#39;&#39;&#39; refreshes the cached zone information then returns the cool setpoint &#39;&#39;&#39;
-    self.refresh_zone_info()
-    return int(self.zone_info[&#39;latestData&#39;][&#39;uiData&#39;][&#39;CoolSetpoint&#39;])</code></pre>
+<pre><code class="python">def get_outdoor_temperature(self) -&gt; str:
+    &#39;&#39;&#39; calls get_outdoor_temperature_raw() then returns it with a degree sign and the display unit &#39;&#39;&#39;
+    raw = self.get_outdoor_temperature_raw()
+    return self._get_with_unit(raw)</code></pre>
 </details>
 </dd>
-<dt id="pyhtcc.pyhtcc.Zone.get_raw_heat_setpoint"><code class="name flex">
-<span>def <span class="ident">get_raw_heat_setpoint</span></span>(<span>self) ‑> int</span>
+<dt id="pyhtcc.pyhtcc.Zone.get_outdoor_temperature_raw"><code class="name flex">
+<span>def <span class="ident">get_outdoor_temperature_raw</span></span>(<span>self) ‑> int</span>
 </code></dt>
 <dd>
-<div class="desc"><p>refreshes the cached zone information then returns the heat setpoint</p></div>
+<div class="desc"><p>refreshes the cached zone information then returns the outdoor temperature raw value</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_raw_heat_setpoint(self) -&gt; int:
-    &#39;&#39;&#39; refreshes the cached zone information then returns the heat setpoint &#39;&#39;&#39;
+<pre><code class="python">def get_outdoor_temperature_raw(self) -&gt; int:
+    &#39;&#39;&#39; refreshes the cached zone information then returns the outdoor temperature raw value &#39;&#39;&#39;
     self.refresh_zone_info()
-    return int(self.zone_info[&#39;latestData&#39;][&#39;uiData&#39;][&#39;HeatSetpoint&#39;])</code></pre>
+    return self.zone_info[&#39;OutdoorTemperature&#39;]</code></pre>
 </details>
 </dd>
 <dt id="pyhtcc.pyhtcc.Zone.refresh_zone_info"><code class="name flex">
@@ -1287,12 +1388,14 @@ More likely than not, most users need not use this call directly.</p></div>
 <h4><code><a title="pyhtcc.pyhtcc.Zone" href="#pyhtcc.pyhtcc.Zone">Zone</a></code></h4>
 <ul class="">
 <li><code><a title="pyhtcc.pyhtcc.Zone.get_cool_setpoint" href="#pyhtcc.pyhtcc.Zone.get_cool_setpoint">get_cool_setpoint</a></code></li>
+<li><code><a title="pyhtcc.pyhtcc.Zone.get_cool_setpoint_raw" href="#pyhtcc.pyhtcc.Zone.get_cool_setpoint_raw">get_cool_setpoint_raw</a></code></li>
 <li><code><a title="pyhtcc.pyhtcc.Zone.get_current_temperature" href="#pyhtcc.pyhtcc.Zone.get_current_temperature">get_current_temperature</a></code></li>
 <li><code><a title="pyhtcc.pyhtcc.Zone.get_current_temperature_raw" href="#pyhtcc.pyhtcc.Zone.get_current_temperature_raw">get_current_temperature_raw</a></code></li>
 <li><code><a title="pyhtcc.pyhtcc.Zone.get_heat_setpoint" href="#pyhtcc.pyhtcc.Zone.get_heat_setpoint">get_heat_setpoint</a></code></li>
+<li><code><a title="pyhtcc.pyhtcc.Zone.get_heat_setpoint_raw" href="#pyhtcc.pyhtcc.Zone.get_heat_setpoint_raw">get_heat_setpoint_raw</a></code></li>
 <li><code><a title="pyhtcc.pyhtcc.Zone.get_name" href="#pyhtcc.pyhtcc.Zone.get_name">get_name</a></code></li>
-<li><code><a title="pyhtcc.pyhtcc.Zone.get_raw_cool_setpoint" href="#pyhtcc.pyhtcc.Zone.get_raw_cool_setpoint">get_raw_cool_setpoint</a></code></li>
-<li><code><a title="pyhtcc.pyhtcc.Zone.get_raw_heat_setpoint" href="#pyhtcc.pyhtcc.Zone.get_raw_heat_setpoint">get_raw_heat_setpoint</a></code></li>
+<li><code><a title="pyhtcc.pyhtcc.Zone.get_outdoor_temperature" href="#pyhtcc.pyhtcc.Zone.get_outdoor_temperature">get_outdoor_temperature</a></code></li>
+<li><code><a title="pyhtcc.pyhtcc.Zone.get_outdoor_temperature_raw" href="#pyhtcc.pyhtcc.Zone.get_outdoor_temperature_raw">get_outdoor_temperature_raw</a></code></li>
 <li><code><a title="pyhtcc.pyhtcc.Zone.refresh_zone_info" href="#pyhtcc.pyhtcc.Zone.refresh_zone_info">refresh_zone_info</a></code></li>
 <li><code><a title="pyhtcc.pyhtcc.Zone.set_permananent_cool_setpoint" href="#pyhtcc.pyhtcc.Zone.set_permananent_cool_setpoint">set_permananent_cool_setpoint</a></code></li>
 <li><code><a title="pyhtcc.pyhtcc.Zone.set_permananent_heat_setpoint" href="#pyhtcc.pyhtcc.Zone.set_permananent_heat_setpoint">set_permananent_heat_setpoint</a></code></li>
@@ -1312,7 +1415,7 @@ More likely than not, most users need not use this call directly.</p></div>
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.8.2</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.8.3</a>.</p>
 </footer>
 </body>
 </html>
