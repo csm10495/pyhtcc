@@ -265,7 +265,7 @@ class PyHTCC:
             &#39;Password&#39; : self.password,
         })
         if result.status_code != 200:
-            raise AuthenticationError(f&#34;Unable to authenticate as {self.username}&#34;)
+            raise AuthenticationError(f&#34;Unable to authenticate as {self.username}. Status was: {result.status_code}&#34;)
 
         logger.debug(f&#34;resulting url from authentication: {result.url}&#34;)
 
@@ -515,7 +515,7 @@ if __name__ == &#39;__main__&#39;:
             &#39;Password&#39; : self.password,
         })
         if result.status_code != 200:
-            raise AuthenticationError(f&#34;Unable to authenticate as {self.username}&#34;)
+            raise AuthenticationError(f&#34;Unable to authenticate as {self.username}. Status was: {result.status_code}&#34;)
 
         logger.debug(f&#34;resulting url from authentication: {result.url}&#34;)
 
