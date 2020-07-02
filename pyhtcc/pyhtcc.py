@@ -236,7 +236,7 @@ class PyHTCC:
             'Password' : self.password,
         })
         if result.status_code != 200:
-            raise AuthenticationError(f"Unable to authenticate as {self.username}")
+            raise AuthenticationError(f"Unable to authenticate as {self.username}. Status was: {result.status_code}")
 
         logger.debug(f"resulting url from authentication: {result.url}")
 
