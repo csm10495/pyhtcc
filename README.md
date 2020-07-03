@@ -35,7 +35,8 @@ optional arguments:
                         environment variable PYHTCC_EMAIL
   -p PASSWORD, --password PASSWORD
                         Password to login to TCC. If not given uses the
-                        environment variable PYHTCC_PASS
+                        environment variable PYHTCC_PASS. If neither are
+                        given, will prompt for user input.
   -n NAME, --name NAME  Thermostat name to target. If not given, targets all
                         zones
   -s, --show-info       If given, will show info and quit.

@@ -48,6 +48,10 @@ class AuthenticationError(ValueError):
     &#39;&#39;&#39; denoted if we are completely unable to authenticate (even after exponential backoff) &#39;&#39;&#39;
     pass
 
+class LoginCredentialsInvalidError(ValueError):
+    &#39;&#39;&#39; denoted if it appears as though invalid login credentials were given &#39;&#39;&#39;
+    pass
+
 class TooManyAttemptsError(EnvironmentError):
     &#39;&#39;&#39; raised if attempting to authenticate led to us being told we&#39;ve tried too many times &#39;&#39;&#39;
     pass
@@ -267,6 +271,9 @@ class PyHTCC:
         if result.status_code != 200:
             raise AuthenticationError(f&#34;Unable to authenticate as {self.username}. Status was: {result.status_code}&#34;)
 
+        if &#39;The email or password provided is incorrect&#39; in result.text or &#39;The email address is not in the correct format&#39; in result.text:
+            raise LoginCredentialsInvalidError(f&#34;Email ({self.username}) and/or password appear to have been rejected&#34;)
+
         logger.debug(f&#34;resulting url from authentication: {result.url}&#34;)
 
         if &#39;TooManyAttempts&#39; in result.url:
@@ -321,6 +328,20 @@ class PyHTCC:
             &#39;OutdoorHumidity&#39; : outdoor_humidity,
         }
 
+    def _post_zone_list_data(self, page_num:int) -&gt; requests.Response:
+        &#39;&#39;&#39;
+        Private function to call a specific TCC API
+        See tests for sample output.
+        &#39;&#39;&#39;
+        return self.session.post(f&#39;https://www.mytotalconnectcomfort.com/portal/Device/GetZoneListData?locationId={self._locationId}&amp;page={page_num}&#39;, headers={&#39;X-Requested-With&#39;: &#39;XMLHttpRequest&#39;})
+
+    def _get_check_data_session(self, device_id:int) -&gt; requests.Response:
+        &#39;&#39;&#39;
+        Private function to call a specific TCC API
+        See tests for sample output.
+        &#39;&#39;&#39;
+        return self.session.get(f&#39;https://www.mytotalconnectcomfort.com/portal/Device/CheckDataSession/{device_id}&#39;, headers={&#39;X-Requested-With&#39;: &#39;XMLHttpRequest&#39;})
+
     def get_zones_info(self) -&gt; list:
         &#39;&#39;&#39;
         Returns a list of dicts corresponding with each one corresponding to a particular zone.
@@ -328,7 +349,7 @@ class PyHTCC:
         zones = []
         for page_num in range(1, 6):
             logger.debug(f&#34;Attempting to get zones for location id, page: {self._locationId}, {page_num}&#34;)
-            result = self.session.post(f&#39;https://www.mytotalconnectcomfort.com/portal/Device/GetZoneListData?locationId={self._locationId}&amp;page={page_num}&#39;, headers={&#39;X-Requested-With&#39;: &#39;XMLHttpRequest&#39;})
+            result = self._post_zone_list_data(page_num)
 
             try:
                 data = result.json()
@@ -350,7 +371,7 @@ class PyHTCC:
             zone[&#39;Name&#39;] = name
 
             device_id = zone[&#39;DeviceID&#39;]
-            result = self.session.get(f&#39;https://www.mytotalconnectcomfort.com/portal/Device/CheckDataSession/{device_id}&#39;, headers={&#39;X-Requested-With&#39;: &#39;XMLHttpRequest&#39;})
+            result = self._get_check_data_session(device_id)
 
             try:
                 more_data = result.json()
@@ -449,6 +470,27 @@ if __name__ == &#39;__main__&#39;:
 <li>builtins.BaseException</li>
 </ul>
 </dd>
+<dt id="pyhtcc.pyhtcc.LoginCredentialsInvalidError"><code class="flex name class">
+<span>class <span class="ident">LoginCredentialsInvalidError</span></span>
+<span>(</span><span>...)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>denoted if it appears as though invalid login credentials were given</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class LoginCredentialsInvalidError(ValueError):
+    &#39;&#39;&#39; denoted if it appears as though invalid login credentials were given &#39;&#39;&#39;
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.ValueError</li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
 <dt id="pyhtcc.pyhtcc.PyHTCC"><code class="flex name class">
 <span>class <span class="ident">PyHTCC</span></span>
 <span>(</span><span>username: str, password: str)</span>
@@ -517,6 +559,9 @@ if __name__ == &#39;__main__&#39;:
         if result.status_code != 200:
             raise AuthenticationError(f&#34;Unable to authenticate as {self.username}. Status was: {result.status_code}&#34;)
 
+        if &#39;The email or password provided is incorrect&#39; in result.text or &#39;The email address is not in the correct format&#39; in result.text:
+            raise LoginCredentialsInvalidError(f&#34;Email ({self.username}) and/or password appear to have been rejected&#34;)
+
         logger.debug(f&#34;resulting url from authentication: {result.url}&#34;)
 
         if &#39;TooManyAttempts&#39; in result.url:
@@ -571,6 +616,20 @@ if __name__ == &#39;__main__&#39;:
             &#39;OutdoorHumidity&#39; : outdoor_humidity,
         }
 
+    def _post_zone_list_data(self, page_num:int) -&gt; requests.Response:
+        &#39;&#39;&#39;
+        Private function to call a specific TCC API
+        See tests for sample output.
+        &#39;&#39;&#39;
+        return self.session.post(f&#39;https://www.mytotalconnectcomfort.com/portal/Device/GetZoneListData?locationId={self._locationId}&amp;page={page_num}&#39;, headers={&#39;X-Requested-With&#39;: &#39;XMLHttpRequest&#39;})
+
+    def _get_check_data_session(self, device_id:int) -&gt; requests.Response:
+        &#39;&#39;&#39;
+        Private function to call a specific TCC API
+        See tests for sample output.
+        &#39;&#39;&#39;
+        return self.session.get(f&#39;https://www.mytotalconnectcomfort.com/portal/Device/CheckDataSession/{device_id}&#39;, headers={&#39;X-Requested-With&#39;: &#39;XMLHttpRequest&#39;})
+
     def get_zones_info(self) -&gt; list:
         &#39;&#39;&#39;
         Returns a list of dicts corresponding with each one corresponding to a particular zone.
@@ -578,7 +637,7 @@ if __name__ == &#39;__main__&#39;:
         zones = []
         for page_num in range(1, 6):
             logger.debug(f&#34;Attempting to get zones for location id, page: {self._locationId}, {page_num}&#34;)
-            result = self.session.post(f&#39;https://www.mytotalconnectcomfort.com/portal/Device/GetZoneListData?locationId={self._locationId}&amp;page={page_num}&#39;, headers={&#39;X-Requested-With&#39;: &#39;XMLHttpRequest&#39;})
+            result = self._post_zone_list_data(page_num)
 
             try:
                 data = result.json()
@@ -600,7 +659,7 @@ if __name__ == &#39;__main__&#39;:
             zone[&#39;Name&#39;] = name
 
             device_id = zone[&#39;DeviceID&#39;]
-            result = self.session.get(f&#39;https://www.mytotalconnectcomfort.com/portal/Device/CheckDataSession/{device_id}&#39;, headers={&#39;X-Requested-With&#39;: &#39;XMLHttpRequest&#39;})
+            result = self._get_check_data_session(device_id)
 
             try:
                 more_data = result.json()
@@ -748,7 +807,7 @@ sleep intervals if rate-limiting is preventing sign-on.</p></div>
     zones = []
     for page_num in range(1, 6):
         logger.debug(f&#34;Attempting to get zones for location id, page: {self._locationId}, {page_num}&#34;)
-        result = self.session.post(f&#39;https://www.mytotalconnectcomfort.com/portal/Device/GetZoneListData?locationId={self._locationId}&amp;page={page_num}&#39;, headers={&#39;X-Requested-With&#39;: &#39;XMLHttpRequest&#39;})
+        result = self._post_zone_list_data(page_num)
 
         try:
             data = result.json()
@@ -770,7 +829,7 @@ sleep intervals if rate-limiting is preventing sign-on.</p></div>
         zone[&#39;Name&#39;] = name
 
         device_id = zone[&#39;DeviceID&#39;]
-        result = self.session.get(f&#39;https://www.mytotalconnectcomfort.com/portal/Device/CheckDataSession/{device_id}&#39;, headers={&#39;X-Requested-With&#39;: &#39;XMLHttpRequest&#39;})
+        result = self._get_check_data_session(device_id)
 
         try:
             more_data = result.json()
@@ -1367,6 +1426,9 @@ More likely than not, most users need not use this call directly.</p></div>
 <ul>
 <li>
 <h4><code><a title="pyhtcc.pyhtcc.AuthenticationError" href="#pyhtcc.pyhtcc.AuthenticationError">AuthenticationError</a></code></h4>
+</li>
+<li>
+<h4><code><a title="pyhtcc.pyhtcc.LoginCredentialsInvalidError" href="#pyhtcc.pyhtcc.LoginCredentialsInvalidError">LoginCredentialsInvalidError</a></code></h4>
 </li>
 <li>
 <h4><code><a title="pyhtcc.pyhtcc.PyHTCC" href="#pyhtcc.pyhtcc.PyHTCC">PyHTCC</a></code></h4>
