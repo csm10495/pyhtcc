@@ -19,6 +19,10 @@ class AuthenticationError(ValueError):
     ''' denoted if we are completely unable to authenticate (even after exponential backoff) '''
     pass
 
+class LoginCredentialsInvalidError(ValueError):
+    ''' denoted if it appears as though invalid login credentials were given '''
+    pass
+
 class TooManyAttemptsError(EnvironmentError):
     ''' raised if attempting to authenticate led to us being told we've tried too many times '''
     pass
@@ -238,6 +242,9 @@ class PyHTCC:
         if result.status_code != 200:
             raise AuthenticationError(f"Unable to authenticate as {self.username}. Status was: {result.status_code}")
 
+        if 'The email or password provided is incorrect' in result.text or 'The email address is not in the correct format' in result.text:
+            raise LoginCredentialsInvalidError(f"Email ({self.username}) and/or password appear to have been rejected")
+
         logger.debug(f"resulting url from authentication: {result.url}")
 
         if 'TooManyAttempts' in result.url:
@@ -292,6 +299,20 @@ class PyHTCC:
             'OutdoorHumidity' : outdoor_humidity,
         }
 
+    def _post_zone_list_data(self, page_num:int) -> requests.Response:
+        '''
+        Private function to call a specific TCC API
+        See tests for sample output.
+        '''
+        return self.session.post(f'https://www.mytotalconnectcomfort.com/portal/Device/GetZoneListData?locationId={self._locationId}&page={page_num}', headers={'X-Requested-With': 'XMLHttpRequest'})
+
+    def _get_check_data_session(self, device_id:int) -> requests.Response:
+        '''
+        Private function to call a specific TCC API
+        See tests for sample output.
+        '''
+        return self.session.get(f'https://www.mytotalconnectcomfort.com/portal/Device/CheckDataSession/{device_id}', headers={'X-Requested-With': 'XMLHttpRequest'})
+
     def get_zones_info(self) -> list:
         '''
         Returns a list of dicts corresponding with each one corresponding to a particular zone.
@@ -299,7 +320,7 @@ class PyHTCC:
         zones = []
         for page_num in range(1, 6):
             logger.debug(f"Attempting to get zones for location id, page: {self._locationId}, {page_num}")
-            result = self.session.post(f'https://www.mytotalconnectcomfort.com/portal/Device/GetZoneListData?locationId={self._locationId}&page={page_num}', headers={'X-Requested-With': 'XMLHttpRequest'})
+            result = self._post_zone_list_data(page_num)
 
             try:
                 data = result.json()
@@ -321,7 +342,7 @@ class PyHTCC:
             zone['Name'] = name
 
             device_id = zone['DeviceID']
-            result = self.session.get(f'https://www.mytotalconnectcomfort.com/portal/Device/CheckDataSession/{device_id}', headers={'X-Requested-With': 'XMLHttpRequest'})
+            result = self._get_check_data_session(device_id)
 
             try:
                 more_data = result.json()

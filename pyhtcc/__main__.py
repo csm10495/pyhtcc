@@ -2,6 +2,7 @@
 A cli entry point to do quick calls to PyHTCC
 '''
 import argparse
+import getpass
 import os
 import pprint
 
@@ -10,7 +11,7 @@ from .pyhtcc import PyHTCC, Zone, enableConsoleLogging
 def main():
     parser = argparse.ArgumentParser('pyhtcc', description='A CLI to perform actions on a Honeywell Total Comfort Connect thermostat system')
     parser.add_argument('-u', '--user', type=str, help='Username to login to TCC. If not given uses the environment variable PYHTCC_EMAIL')
-    parser.add_argument('-p', '--password', type=str, help='Password to login to TCC. If not given uses the environment variable PYHTCC_PASS')
+    parser.add_argument('-p', '--password', type=str, help='Password to login to TCC. If not given uses the environment variable PYHTCC_PASS. If neither are given, will prompt for user input.')
     parser.add_argument('-n', '--name', type=str, help='Thermostat name to target. If not given, targets all zones')
     parser.add_argument('-s', '--show-info', action='store_true', help='If given, will show info and quit.')
     parser.add_argument('-d', '--debug', action='store_true', help='If given, will log to stdout')
@@ -37,7 +38,7 @@ def main():
         if 'PYHTCC_PASS' in os.environ:
             password = os.environ['PYHTCC_PASS']
         else:
-            raise ValueError("Must provide -p/--password or have environment variable PYHTCC_PASS set")
+            password = getpass.getpass(f'Password ({user}): ')
 
     pyhtcc = PyHTCC(user, password)
 
