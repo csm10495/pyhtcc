@@ -22,7 +22,7 @@ jobs:
       - name: Install pytest
         run: python -m pip install pytest
       - name: Install pyhtcc/requirements
-        working-directory: $GITHUB_WORKSPACE
+        working-directory: $GITHUB_WORKSPACE/pyhtcc
         run: python -m pip install .
       - name: Run pytest
         run: python -m pytest
