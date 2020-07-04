@@ -1,3 +1,5 @@
+![Run tests](https://github.com/csm10495/pyhtcc/workflows/Run%20tests/badge.svg) [![PyPI version](https://badge.fury.io/py/pyhtcc.svg)](https://badge.fury.io/py/pyhtcc)
+
 # PyHTCC
 
 An (unofficial) library for interfacing with a Honeywell Total Connect Comfort (TCC) thermostat system. It includes both a simple CLI and an API.
