@@ -325,7 +325,7 @@ class PyHTCC:
             try:
                 data = result.json()
             except Exception as ex:
-                logger.exception("Unable to decode json data returned by GetZoneList. Data was:\n {result.text}")
+                logger.exception(f"Unable to decode json data returned by GetZoneList. Data was:\n {result.text}")
                 raise
 
             # once we go to an empty page, we're done. Luckily it returns empty json instead of erroring
