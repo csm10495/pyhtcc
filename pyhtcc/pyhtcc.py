@@ -254,7 +254,12 @@ class PyHTCC:
             raise RedirectDidNotHappenError(f"{result.url} did not represent the needed redirect")
 
         self._locationId = result.url.split('portal/')[1].split('/')[0]
-        self._locationId = int(self._locationId)
+        try:
+            self._locationId = int(self._locationId)
+        except ValueError:
+            logger.debug("Unable to grab location id via url... checking content instead")
+            self._locationId = int(re.findall(r'locationId=(\d+)', result.text)[0])
+            
         logger.debug(f"location id is {self._locationId}")
 
     def _get_name_for_device_id(self, device_id:int) -> str:
