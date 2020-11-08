@@ -285,3 +285,16 @@ class TestPyHTCC:
         assert zone.turn_system_off()
         assert zone.set_permananent_cool_setpoint(1)
         assert zone.set_permananent_heat_setpoint(2)
+
+    def test_setting_location_id_via_url(self):
+        result = unittest.mock.MagicMock()
+        result.url = 'https://www.mytotalconnectcomfort.com/portal/90210/Zones'
+        self.pyhtcc._set_location_id_from_result(result)
+        assert self.pyhtcc._locationId == 90210
+
+    def test_setting_location_id_via_content(self):
+        result = unittest.mock.MagicMock()
+        result.url = 'https://www.mytotalconnectcomfort.com/portal/Device/Control/bleh?page=1'
+        result.text = '''Control.Urls.refreshAlerts = '/portal/Device/Alerts?locationId=902102&deviceId=9999';'''
+        self.pyhtcc._set_location_id_from_result(result)
+        assert self.pyhtcc._locationId == 902102
