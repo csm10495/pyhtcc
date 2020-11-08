@@ -27,6 +27,7 @@ jobs:
         ls
         python3 --version
         sudo apt-get install python3-setuptools -y
+        python3 -m pip install gspread -U
         python3 -m pip install .
 
         sudo python3 generate_docs.py
