@@ -180,8 +180,8 @@ class Zone:
         logger.info(f&#34;setting heat on with a target temp of: {temp}&#34;)
         return self.submit_control_changes({
             &#39;HeatSetpoint&#39; : temp,
-            &#39;StatusHeat&#39; : 1,
-            &#39;StatusCool&#39; : 1,
+            &#39;StatusHeat&#39; : 2,
+            &#39;StatusCool&#39; : 2,
             &#39;SystemSwitch&#39; : 1,
         })
 
@@ -1078,8 +1078,8 @@ Also takes in an authenticated instance of an PyHTCC object</p></div>
         logger.info(f&#34;setting heat on with a target temp of: {temp}&#34;)
         return self.submit_control_changes({
             &#39;HeatSetpoint&#39; : temp,
-            &#39;StatusHeat&#39; : 1,
-            &#39;StatusCool&#39; : 1,
+            &#39;StatusHeat&#39; : 2,
+            &#39;StatusCool&#39; : 2,
             &#39;SystemSwitch&#39; : 1,
         })
 
@@ -1313,8 +1313,8 @@ This will also attempt to turn the thermostat to 'Heat'</p></div>
     logger.info(f&#34;setting heat on with a target temp of: {temp}&#34;)
     return self.submit_control_changes({
         &#39;HeatSetpoint&#39; : temp,
-        &#39;StatusHeat&#39; : 1,
-        &#39;StatusCool&#39; : 1,
+        &#39;StatusHeat&#39; : 2,
+        &#39;StatusCool&#39; : 2,
         &#39;SystemSwitch&#39; : 1,
     })</code></pre>
 </details>
