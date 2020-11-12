@@ -151,8 +151,8 @@ class Zone:
         logger.info(f"setting heat on with a target temp of: {temp}")
         return self.submit_control_changes({
             'HeatSetpoint' : temp,
-            'StatusHeat' : 1,
-            'StatusCool' : 1,
+            'StatusHeat' : 2,
+            'StatusCool' : 2,
             'SystemSwitch' : 1,
         })
 
