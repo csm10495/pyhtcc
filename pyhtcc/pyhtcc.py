@@ -335,8 +335,12 @@ class PyHTCC:
             try:
                 data = result.json()
             except Exception as ex:
-                logger.exception(f"Unable to decode json data returned by GetZoneList. Data was:\n {result.text}")
-                raise
+                # we can get a 200 with non-json data if pages aren't needed. Though the 1st page shouldn't give non-json.
+                if page_num == 1:
+                    logger.exception(f"Unable to decode json data returned by GetZoneList. Data was:\n {result.text}")
+                    raise
+                else:
+                    data = {}
 
             # once we go to an empty page, we're done. Luckily it returns empty json instead of erroring
             if not data:
@@ -374,6 +378,7 @@ class PyHTCC:
         '''
         Will grab a Zone object for the given device name (not device id)
         '''
+
         zone_info = self.get_zones_info()
         for a in zone_info:
             if a['Name'] == name:
