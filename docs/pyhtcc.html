@@ -364,8 +364,12 @@ class PyHTCC:
             try:
                 data = result.json()
             except Exception as ex:
-                logger.exception(f&#34;Unable to decode json data returned by GetZoneList. Data was:\n {result.text}&#34;)
-                raise
+                # we can get a 200 with non-json data if pages aren&#39;t needed. Though the 1st page shouldn&#39;t give non-json.
+                if page_num == 1:
+                    logger.exception(f&#34;Unable to decode json data returned by GetZoneList. Data was:\n {result.text}&#34;)
+                    raise
+                else:
+                    data = {}
 
             # once we go to an empty page, we&#39;re done. Luckily it returns empty json instead of erroring
             if not data:
@@ -403,6 +407,7 @@ class PyHTCC:
         &#39;&#39;&#39;
         Will grab a Zone object for the given device name (not device id)
         &#39;&#39;&#39;
+
         zone_info = self.get_zones_info()
         for a in zone_info:
             if a[&#39;Name&#39;] == name:
@@ -662,8 +667,12 @@ if __name__ == &#39;__main__&#39;:
             try:
                 data = result.json()
             except Exception as ex:
-                logger.exception(f&#34;Unable to decode json data returned by GetZoneList. Data was:\n {result.text}&#34;)
-                raise
+                # we can get a 200 with non-json data if pages aren&#39;t needed. Though the 1st page shouldn&#39;t give non-json.
+                if page_num == 1:
+                    logger.exception(f&#34;Unable to decode json data returned by GetZoneList. Data was:\n {result.text}&#34;)
+                    raise
+                else:
+                    data = {}
 
             # once we go to an empty page, we&#39;re done. Luckily it returns empty json instead of erroring
             if not data:
@@ -701,6 +710,7 @@ if __name__ == &#39;__main__&#39;:
         &#39;&#39;&#39;
         Will grab a Zone object for the given device name (not device id)
         &#39;&#39;&#39;
+
         zone_info = self.get_zones_info()
         for a in zone_info:
             if a[&#39;Name&#39;] == name:
@@ -803,6 +813,7 @@ sleep intervals if rate-limiting is preventing sign-on.</p></div>
     &#39;&#39;&#39;
     Will grab a Zone object for the given device name (not device id)
     &#39;&#39;&#39;
+
     zone_info = self.get_zones_info()
     for a in zone_info:
         if a[&#39;Name&#39;] == name:
@@ -832,8 +843,12 @@ sleep intervals if rate-limiting is preventing sign-on.</p></div>
         try:
             data = result.json()
         except Exception as ex:
-            logger.exception(f&#34;Unable to decode json data returned by GetZoneList. Data was:\n {result.text}&#34;)
-            raise
+            # we can get a 200 with non-json data if pages aren&#39;t needed. Though the 1st page shouldn&#39;t give non-json.
+            if page_num == 1:
+                logger.exception(f&#34;Unable to decode json data returned by GetZoneList. Data was:\n {result.text}&#34;)
+                raise
+            else:
+                data = {}
 
         # once we go to an empty page, we&#39;re done. Luckily it returns empty json instead of erroring
         if not data:
