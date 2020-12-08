@@ -235,7 +235,7 @@ class PyHTCC:
 
         logger.debug(f"Attempting authentication for {self.username}")
 
-        result = self.session.post('https://www.mytotalconnectcomfort.com/portal', {
+        result = self.session.post('https://mytotalconnectcomfort.com/portal', {
             'UserName' : self.username,
             'Password' : self.password,
         })
@@ -276,7 +276,7 @@ class PyHTCC:
 
         if device_id not in self._device_id_to_name:
             # grab the name from the portal
-            result = self.session.get(f'https://www.mytotalconnectcomfort.com/portal/Device/Control/{device_id}?page=1')
+            result = self.session.get(f'https://mytotalconnectcomfort.com/portal/Device/Control/{device_id}?page=1')
             self._device_id_to_name[device_id] = re.findall(r'id=\s?"ZoneName"\s?>(.*) Control<', result.text)[0]
             logger.debug(f"Called portal to say {device_id} -> {self._device_id_to_name[device_id]}")
         else:
@@ -288,7 +288,7 @@ class PyHTCC:
         '''
         Private API to find the outdoor information on one of the logged in pages
         '''
-        result = self.session.get(f'https://www.mytotalconnectcomfort.com/portal/Device/Control/{device_id}?page=1')
+        result = self.session.get(f'https://mytotalconnectcomfort.com/portal/Device/Control/{device_id}?page=1')
         result.raise_for_status()
 
         text_data = result.text
@@ -314,14 +314,14 @@ class PyHTCC:
         Private function to call a specific TCC API
         See tests for sample output.
         '''
-        return self.session.post(f'https://www.mytotalconnectcomfort.com/portal/Device/GetZoneListData?locationId={self._locationId}&page={page_num}', headers={'X-Requested-With': 'XMLHttpRequest'})
+        return self.session.post(f'https://mytotalconnectcomfort.com/portal/Device/GetZoneListData?locationId={self._locationId}&page={page_num}', headers={'X-Requested-With': 'XMLHttpRequest'})
 
     def _get_check_data_session(self, device_id:int) -> requests.Response:
         '''
         Private function to call a specific TCC API
         See tests for sample output.
         '''
-        return self.session.get(f'https://www.mytotalconnectcomfort.com/portal/Device/CheckDataSession/{device_id}', headers={'X-Requested-With': 'XMLHttpRequest'})
+        return self.session.get(f'https://mytotalconnectcomfort.com/portal/Device/CheckDataSession/{device_id}', headers={'X-Requested-With': 'XMLHttpRequest'})
 
     def get_zones_info(self) -> list:
         '''
@@ -411,7 +411,7 @@ class PyHTCC:
             data[k] = v
 
         logger.debug(f"Posting data to SubmitControlScreenChange: {data}")
-        result = self.session.post('https://www.mytotalconnectcomfort.com/portal/Device/SubmitControlScreenChanges', json=data)
+        result = self.session.post('https://mytotalconnectcomfort.com/portal/Device/SubmitControlScreenChanges', json=data)
 
         json_data = result.json()
         if json_data['success'] != 1:
