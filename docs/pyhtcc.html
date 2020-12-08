@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.9.1" />
+<meta name="generator" content="pdoc 0.9.2" />
 <title>pyhtcc.pyhtcc API documentation</title>
 <meta name="description" content="Holds implementation guts for PyHTCC" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
@@ -264,7 +264,7 @@ class PyHTCC:
 
         logger.debug(f&#34;Attempting authentication for {self.username}&#34;)
 
-        result = self.session.post(&#39;https://www.mytotalconnectcomfort.com/portal&#39;, {
+        result = self.session.post(&#39;https://mytotalconnectcomfort.com/portal&#39;, {
             &#39;UserName&#39; : self.username,
             &#39;Password&#39; : self.password,
         })
@@ -305,7 +305,7 @@ class PyHTCC:
 
         if device_id not in self._device_id_to_name:
             # grab the name from the portal
-            result = self.session.get(f&#39;https://www.mytotalconnectcomfort.com/portal/Device/Control/{device_id}?page=1&#39;)
+            result = self.session.get(f&#39;https://mytotalconnectcomfort.com/portal/Device/Control/{device_id}?page=1&#39;)
             self._device_id_to_name[device_id] = re.findall(r&#39;id=\s?&#34;ZoneName&#34;\s?&gt;(.*) Control&lt;&#39;, result.text)[0]
             logger.debug(f&#34;Called portal to say {device_id} -&gt; {self._device_id_to_name[device_id]}&#34;)
         else:
@@ -317,7 +317,7 @@ class PyHTCC:
         &#39;&#39;&#39;
         Private API to find the outdoor information on one of the logged in pages
         &#39;&#39;&#39;
-        result = self.session.get(f&#39;https://www.mytotalconnectcomfort.com/portal/Device/Control/{device_id}?page=1&#39;)
+        result = self.session.get(f&#39;https://mytotalconnectcomfort.com/portal/Device/Control/{device_id}?page=1&#39;)
         result.raise_for_status()
 
         text_data = result.text
@@ -343,14 +343,14 @@ class PyHTCC:
         Private function to call a specific TCC API
         See tests for sample output.
         &#39;&#39;&#39;
-        return self.session.post(f&#39;https://www.mytotalconnectcomfort.com/portal/Device/GetZoneListData?locationId={self._locationId}&amp;page={page_num}&#39;, headers={&#39;X-Requested-With&#39;: &#39;XMLHttpRequest&#39;})
+        return self.session.post(f&#39;https://mytotalconnectcomfort.com/portal/Device/GetZoneListData?locationId={self._locationId}&amp;page={page_num}&#39;, headers={&#39;X-Requested-With&#39;: &#39;XMLHttpRequest&#39;})
 
     def _get_check_data_session(self, device_id:int) -&gt; requests.Response:
         &#39;&#39;&#39;
         Private function to call a specific TCC API
         See tests for sample output.
         &#39;&#39;&#39;
-        return self.session.get(f&#39;https://www.mytotalconnectcomfort.com/portal/Device/CheckDataSession/{device_id}&#39;, headers={&#39;X-Requested-With&#39;: &#39;XMLHttpRequest&#39;})
+        return self.session.get(f&#39;https://mytotalconnectcomfort.com/portal/Device/CheckDataSession/{device_id}&#39;, headers={&#39;X-Requested-With&#39;: &#39;XMLHttpRequest&#39;})
 
     def get_zones_info(self) -&gt; list:
         &#39;&#39;&#39;
@@ -440,7 +440,7 @@ class PyHTCC:
             data[k] = v
 
         logger.debug(f&#34;Posting data to SubmitControlScreenChange: {data}&#34;)
-        result = self.session.post(&#39;https://www.mytotalconnectcomfort.com/portal/Device/SubmitControlScreenChanges&#39;, json=data)
+        result = self.session.post(&#39;https://mytotalconnectcomfort.com/portal/Device/SubmitControlScreenChanges&#39;, json=data)
 
         json_data = result.json()
         if json_data[&#39;success&#39;] != 1:
@@ -567,7 +567,7 @@ if __name__ == &#39;__main__&#39;:
 
         logger.debug(f&#34;Attempting authentication for {self.username}&#34;)
 
-        result = self.session.post(&#39;https://www.mytotalconnectcomfort.com/portal&#39;, {
+        result = self.session.post(&#39;https://mytotalconnectcomfort.com/portal&#39;, {
             &#39;UserName&#39; : self.username,
             &#39;Password&#39; : self.password,
         })
@@ -608,7 +608,7 @@ if __name__ == &#39;__main__&#39;:
 
         if device_id not in self._device_id_to_name:
             # grab the name from the portal
-            result = self.session.get(f&#39;https://www.mytotalconnectcomfort.com/portal/Device/Control/{device_id}?page=1&#39;)
+            result = self.session.get(f&#39;https://mytotalconnectcomfort.com/portal/Device/Control/{device_id}?page=1&#39;)
             self._device_id_to_name[device_id] = re.findall(r&#39;id=\s?&#34;ZoneName&#34;\s?&gt;(.*) Control&lt;&#39;, result.text)[0]
             logger.debug(f&#34;Called portal to say {device_id} -&gt; {self._device_id_to_name[device_id]}&#34;)
         else:
@@ -620,7 +620,7 @@ if __name__ == &#39;__main__&#39;:
         &#39;&#39;&#39;
         Private API to find the outdoor information on one of the logged in pages
         &#39;&#39;&#39;
-        result = self.session.get(f&#39;https://www.mytotalconnectcomfort.com/portal/Device/Control/{device_id}?page=1&#39;)
+        result = self.session.get(f&#39;https://mytotalconnectcomfort.com/portal/Device/Control/{device_id}?page=1&#39;)
         result.raise_for_status()
 
         text_data = result.text
@@ -646,14 +646,14 @@ if __name__ == &#39;__main__&#39;:
         Private function to call a specific TCC API
         See tests for sample output.
         &#39;&#39;&#39;
-        return self.session.post(f&#39;https://www.mytotalconnectcomfort.com/portal/Device/GetZoneListData?locationId={self._locationId}&amp;page={page_num}&#39;, headers={&#39;X-Requested-With&#39;: &#39;XMLHttpRequest&#39;})
+        return self.session.post(f&#39;https://mytotalconnectcomfort.com/portal/Device/GetZoneListData?locationId={self._locationId}&amp;page={page_num}&#39;, headers={&#39;X-Requested-With&#39;: &#39;XMLHttpRequest&#39;})
 
     def _get_check_data_session(self, device_id:int) -&gt; requests.Response:
         &#39;&#39;&#39;
         Private function to call a specific TCC API
         See tests for sample output.
         &#39;&#39;&#39;
-        return self.session.get(f&#39;https://www.mytotalconnectcomfort.com/portal/Device/CheckDataSession/{device_id}&#39;, headers={&#39;X-Requested-With&#39;: &#39;XMLHttpRequest&#39;})
+        return self.session.get(f&#39;https://mytotalconnectcomfort.com/portal/Device/CheckDataSession/{device_id}&#39;, headers={&#39;X-Requested-With&#39;: &#39;XMLHttpRequest&#39;})
 
     def get_zones_info(self) -&gt; list:
         &#39;&#39;&#39;
@@ -743,7 +743,7 @@ if __name__ == &#39;__main__&#39;:
             data[k] = v
 
         logger.debug(f&#34;Posting data to SubmitControlScreenChange: {data}&#34;)
-        result = self.session.post(&#39;https://www.mytotalconnectcomfort.com/portal/Device/SubmitControlScreenChanges&#39;, json=data)
+        result = self.session.post(&#39;https://mytotalconnectcomfort.com/portal/Device/SubmitControlScreenChanges&#39;, json=data)
 
         json_data = result.json()
         if json_data[&#39;success&#39;] != 1:
@@ -912,7 +912,7 @@ the SubmitControlScreenChanges/ endpoint.</p></div>
         data[k] = v
 
     logger.debug(f&#34;Posting data to SubmitControlScreenChange: {data}&#34;)
-    result = self.session.post(&#39;https://www.mytotalconnectcomfort.com/portal/Device/SubmitControlScreenChanges&#39;, json=data)
+    result = self.session.post(&#39;https://mytotalconnectcomfort.com/portal/Device/SubmitControlScreenChanges&#39;, json=data)
 
     json_data = result.json()
     if json_data[&#39;success&#39;] != 1:
@@ -1512,7 +1512,7 @@ More likely than not, most users need not use this call directly.</p></div>
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.1</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.2</a>.</p>
 </footer>
 </body>
 </html>
