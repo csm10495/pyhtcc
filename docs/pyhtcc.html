@@ -52,6 +52,10 @@ class LoginCredentialsInvalidError(ValueError):
     &#39;&#39;&#39; denoted if it appears as though invalid login credentials were given &#39;&#39;&#39;
     pass
 
+class LoginUnexpectedError(EnvironmentError):
+    &#39;&#39;&#39; raised if we logged in, but the site says that there was an unexpected error&#39;&#39;&#39;
+    pass
+
 class TooManyAttemptsError(EnvironmentError):
     &#39;&#39;&#39; raised if attempting to authenticate led to us being told we&#39;ve tried too many times &#39;&#39;&#39;
     pass
@@ -244,7 +248,7 @@ class PyHTCC:
             logger.debug(f&#34;Starting authentication attempt #{i + 1}&#34;)
             try:
                 return self._do_authenticate()
-            except (TooManyAttemptsError, RedirectDidNotHappenError) as ex:
+            except (TooManyAttemptsError, RedirectDidNotHappenError, LoginUnexpectedError) as ex:
                 logger.exception(&#34;Unable to authenticate at this moment&#34;)
                 num_seconds = 2 ** i
                 logger.debug(f&#34;Sleeping for {num_seconds} seconds&#34;)
@@ -281,6 +285,9 @@ class PyHTCC:
 
         if &#39;portal/&#39; not in result.url:
             raise RedirectDidNotHappenError(f&#34;{result.url} did not represent the needed redirect&#34;)
+
+        if &#39;/Error&#39; in result.url:
+            raise LoginUnexpectedError(f&#34;{result.url} denotes an error&#34;)
 
         self._set_location_id_from_result(result)
 
@@ -506,6 +513,27 @@ if __name__ == &#39;__main__&#39;:
 <li>builtins.BaseException</li>
 </ul>
 </dd>
+<dt id="pyhtcc.pyhtcc.LoginUnexpectedError"><code class="flex name class">
+<span>class <span class="ident">LoginUnexpectedError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>raised if we logged in, but the site says that there was an unexpected error</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class LoginUnexpectedError(EnvironmentError):
+    &#39;&#39;&#39; raised if we logged in, but the site says that there was an unexpected error&#39;&#39;&#39;
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.OSError</li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
 <dt id="pyhtcc.pyhtcc.PyHTCC"><code class="flex name class">
 <span>class <span class="ident">PyHTCC</span></span>
 <span>(</span><span>username: str, password: str)</span>
@@ -547,7 +575,7 @@ if __name__ == &#39;__main__&#39;:
             logger.debug(f&#34;Starting authentication attempt #{i + 1}&#34;)
             try:
                 return self._do_authenticate()
-            except (TooManyAttemptsError, RedirectDidNotHappenError) as ex:
+            except (TooManyAttemptsError, RedirectDidNotHappenError, LoginUnexpectedError) as ex:
                 logger.exception(&#34;Unable to authenticate at this moment&#34;)
                 num_seconds = 2 ** i
                 logger.debug(f&#34;Sleeping for {num_seconds} seconds&#34;)
@@ -584,6 +612,9 @@ if __name__ == &#39;__main__&#39;:
 
         if &#39;portal/&#39; not in result.url:
             raise RedirectDidNotHappenError(f&#34;{result.url} did not represent the needed redirect&#34;)
+
+        if &#39;/Error&#39; in result.url:
+            raise LoginUnexpectedError(f&#34;{result.url} denotes an error&#34;)
 
         self._set_location_id_from_result(result)
 
@@ -775,7 +806,7 @@ sleep intervals if rate-limiting is preventing sign-on.</p></div>
         logger.debug(f&#34;Starting authentication attempt #{i + 1}&#34;)
         try:
             return self._do_authenticate()
-        except (TooManyAttemptsError, RedirectDidNotHappenError) as ex:
+        except (TooManyAttemptsError, RedirectDidNotHappenError, LoginUnexpectedError) as ex:
             logger.exception(&#34;Unable to authenticate at this moment&#34;)
             num_seconds = 2 ** i
             logger.debug(f&#34;Sleeping for {num_seconds} seconds&#34;)
@@ -1464,6 +1495,9 @@ More likely than not, most users need not use this call directly.</p></div>
 </li>
 <li>
 <h4><code><a title="pyhtcc.pyhtcc.LoginCredentialsInvalidError" href="#pyhtcc.pyhtcc.LoginCredentialsInvalidError">LoginCredentialsInvalidError</a></code></h4>
+</li>
+<li>
+<h4><code><a title="pyhtcc.pyhtcc.LoginUnexpectedError" href="#pyhtcc.pyhtcc.LoginUnexpectedError">LoginUnexpectedError</a></code></h4>
 </li>
 <li>
 <h4><code><a title="pyhtcc.pyhtcc.PyHTCC" href="#pyhtcc.pyhtcc.PyHTCC">PyHTCC</a></code></h4>
