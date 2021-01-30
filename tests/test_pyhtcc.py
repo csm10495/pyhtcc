@@ -9,7 +9,7 @@ import unittest.mock
 import pytest
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
-from pyhtcc import (AuthenticationError, LoginCredentialsInvalidError, PyHTCC,
+from pyhtcc import (AuthenticationError, LoginCredentialsInvalidError, LoginUnexpectedError, PyHTCC,
                     RedirectDidNotHappenError, TooManyAttemptsError, Zone,
                     ZoneNotFoundError)
 
@@ -201,6 +201,10 @@ class TestPyHTCC:
 
         self.mock_post_result(FakeResult({}, url='lol'))
         with pytest.raises(RedirectDidNotHappenError):
+            self.pyhtcc._do_authenticate()
+
+        self.mock_post_result(FakeResult({}, url='https://www.mytotalconnectcomfort.com/portal/Error?aspxerrorpath=/portal/'))
+        with pytest.raises(LoginUnexpectedError):
             self.pyhtcc._do_authenticate()
 
     def test_get_zones_info(self):

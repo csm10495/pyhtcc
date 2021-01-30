@@ -23,6 +23,10 @@ class LoginCredentialsInvalidError(ValueError):
     ''' denoted if it appears as though invalid login credentials were given '''
     pass
 
+class LoginUnexpectedError(EnvironmentError):
+    ''' raised if we logged in, but the site says that there was an unexpected error'''
+    pass
+
 class TooManyAttemptsError(EnvironmentError):
     ''' raised if attempting to authenticate led to us being told we've tried too many times '''
     pass
@@ -215,7 +219,7 @@ class PyHTCC:
             logger.debug(f"Starting authentication attempt #{i + 1}")
             try:
                 return self._do_authenticate()
-            except (TooManyAttemptsError, RedirectDidNotHappenError) as ex:
+            except (TooManyAttemptsError, RedirectDidNotHappenError, LoginUnexpectedError) as ex:
                 logger.exception("Unable to authenticate at this moment")
                 num_seconds = 2 ** i
                 logger.debug(f"Sleeping for {num_seconds} seconds")
@@ -252,6 +256,9 @@ class PyHTCC:
 
         if 'portal/' not in result.url:
             raise RedirectDidNotHappenError(f"{result.url} did not represent the needed redirect")
+
+        if '/Error' in result.url:
+            raise LoginUnexpectedError(f"{result.url} denotes an error")
 
         self._set_location_id_from_result(result)
 
