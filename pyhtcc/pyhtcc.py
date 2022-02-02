@@ -84,6 +84,14 @@ class Zone:
         disp_unit = self.zone_info['DispUnits']
         return f'{raw}°{disp_unit}'
 
+    def get_system_state(self) -> int:
+        '''
+        refreshes the cached zone information then returns the current system mode
+	0, HEAT: 1, OFF: 2, COOL: 3, AUTOHEAT: 4, AUTOCOOL: 5, SOUTHERN_AWAY: 6, UNKNOWN: 7
+        '''
+        self.refresh_zone_info()
+        return int(self.zone_info['latestData']['uiData']['SystemSwitchPosition'])
+
     def get_current_temperature_raw(self) -> int:
         ''' gets the current temperature via refreshing the cached zone information '''
         self.refresh_zone_info()
@@ -96,6 +104,22 @@ class Zone:
         ''' calls get_current_temperature_raw() then adds on a degree sign and the display unit '''
         raw = self.get_current_temperature_raw()
         return self._get_with_unit(raw)
+
+    def get_fan_mode(self) -> int:
+        '''
+        refreshes the cached zone information then returns the current fan mode
+        Auto: 0, On: 1, Circulate: 2, FollowSchedule: 3, Unknown: 4
+        '''
+        self.refresh_zone_info()
+        return int(self.zone_info['latestData']['fanData']['fanIsRunning'])
+
+    def get_fan_running_state(self) -> int:
+        '''
+        refreshes the cached zone information then returns the current fan state
+        0 = Off, 1 = On
+        '''
+        self.refresh_zone_info()
+        return int(self.zone_info['latestData']['fanData']['fanIsRunning'])
 
     def get_heat_setpoint_raw(self) -> int:
         ''' refreshes the cached zone information then returns the heat setpoint '''
