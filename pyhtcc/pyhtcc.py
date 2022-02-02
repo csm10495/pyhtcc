@@ -92,6 +92,25 @@ class Zone:
         self.refresh_zone_info()
         return int(self.zone_info['latestData']['uiData']['SystemSwitchPosition'])
 
+    def get_call_for_heat_state(self) -> int:
+        '''
+        refreshes the cached zone information then returns the call for heat state
+        0 = No Call for Heat, 1 = Calling for Heat
+        '''
+        sys_mode = self.get_system_state() # zone info refreshed via this call
+        if(sys_mode == 1): # Heat
+            return int(self.zone_info['latestData']['uiData']['EquipmentOutputStatus'])
+
+    def get_call_for_cool_state(self) -> int:
+        '''
+        refreshes the cached zone information then returns the call for cool state
+        0 = No Call for Cool, 1 = Calling for Cool
+        '''
+        sys_mode = self.get_system_state() # zone info refreshed via this call
+        if(sys_mode == 3): # Cool
+            return int(self.zone_info['latestData']['uiData']['EquipmentOutputStatus'])
+
+
     def get_current_temperature_raw(self) -> int:
         ''' gets the current temperature via refreshing the cached zone information '''
         self.refresh_zone_info()
