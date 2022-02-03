@@ -130,7 +130,7 @@ class Zone:
         Auto: 0, On: 1, Circulate: 2, FollowSchedule: 3, Unknown: 4
         '''
         self.refresh_zone_info()
-        return int(self.zone_info['latestData']['fanData']['fanIsRunning'])
+        return int(self.zone_info['latestData']['fanData']['fanMode'])
 
     def get_fan_running_state(self) -> int:
         '''
