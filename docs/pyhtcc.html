@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.9.2" />
+<meta name="generator" content="pdoc 0.10.0" />
 <title>pyhtcc.pyhtcc API documentation</title>
 <meta name="description" content="Holds implementation guts for PyHTCC" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
@@ -30,8 +30,7 @@
 <pre><code class="python">&#39;&#39;&#39;
 Holds implementation guts for PyHTCC
 &#39;&#39;&#39;
-import argparse
-import json
+import enum
 import os
 import re
 import time
@@ -67,6 +66,29 @@ class RedirectDidNotHappenError(EnvironmentError):
 class ZoneNotFoundError(EnvironmentError):
     &#39;&#39;&#39; raised if the zone could not be found on refresh &#39;&#39;&#39;
     pass
+
+class SystemMode(enum.IntEnum):
+    &#39;&#39;&#39;
+    Enum for which mode the system is currently using
+    &#39;&#39;&#39;
+    EMHeat = 0
+    Heat = 1
+    Off = 2
+    Cool = 3
+    AutoHeat = 4
+    AutoCool = 5
+    SouthernAway = 6
+    Unknown = 7
+
+class FanMode(enum.IntEnum):
+    &#39;&#39;&#39;
+    Enum for which mode the fan is currently using
+    &#39;&#39;&#39;
+    Auto = 0
+    On = 1
+    Circulate = 2
+    FollowSchedule = 3
+    Unknown = 4
 
 class Zone:
     &#39;&#39;&#39;
@@ -113,6 +135,35 @@ class Zone:
         disp_unit = self.zone_info[&#39;DispUnits&#39;]
         return f&#39;{raw}°{disp_unit}&#39;
 
+    def get_system_mode(self) -&gt; SystemMode:
+        &#39;&#39;&#39;
+        refreshes the cached zone information then returns the current system mode
+        &#39;&#39;&#39;
+        self.refresh_zone_info()
+        return SystemMode(self.zone_info[&#39;latestData&#39;][&#39;uiData&#39;][&#39;SystemSwitchPosition&#39;])
+
+    def is_equipment_output_on(self) -&gt; bool:
+        &#39;&#39;&#39;
+        Refreshes the cached zone information then Returns true if the EquipmentOutputStatus
+        is non 0. This typically meansthe system is heating/cooling.
+        &#39;&#39;&#39;
+        self.refresh_zone_info()
+        return bool(self.zone_info[&#39;latestData&#39;][&#39;uiData&#39;][&#39;EquipmentOutputStatus&#39;])
+
+    def is_calling_for_heat(self) -&gt; int:
+        &#39;&#39;&#39;
+        Refreshes the cached zone information and checks if the system mode is heating
+        &#39;&#39;&#39;
+        return self.get_system_mode() in (SystemMode.Heat, SystemMode.AutoHeat, SystemMode.EMHeat) and \
+            self.is_equipment_output_on()
+
+    def is_calling_for_cool(self) -&gt; int:
+        &#39;&#39;&#39;
+        Refreshes the cached zone information and checks if the system mode is cooling
+        &#39;&#39;&#39;
+        return self.get_system_mode() in (SystemMode.Cool, SystemMode.AutoCool) and \
+            self.is_equipment_output_on()
+
     def get_current_temperature_raw(self) -&gt; int:
         &#39;&#39;&#39; gets the current temperature via refreshing the cached zone information &#39;&#39;&#39;
         self.refresh_zone_info()
@@ -125,6 +176,20 @@ class Zone:
         &#39;&#39;&#39; calls get_current_temperature_raw() then adds on a degree sign and the display unit &#39;&#39;&#39;
         raw = self.get_current_temperature_raw()
         return self._get_with_unit(raw)
+
+    def get_fan_mode(self) -&gt; FanMode:
+        &#39;&#39;&#39;
+        refreshes the cached zone information then returns the current FanMode
+        &#39;&#39;&#39;
+        self.refresh_zone_info()
+        return FanMode(self.zone_info[&#39;latestData&#39;][&#39;fanData&#39;][&#39;fanMode&#39;])
+
+    def is_fan_running(self) -&gt; bool:
+        &#39;&#39;&#39;
+        refreshes the cached zone information then returns True if the fan is running
+        &#39;&#39;&#39;
+        self.refresh_zone_info()
+        return bool(self.zone_info[&#39;latestData&#39;][&#39;fanData&#39;][&#39;fanIsRunning&#39;])
 
     def get_heat_setpoint_raw(self) -&gt; int:
         &#39;&#39;&#39; refreshes the cached zone information then returns the heat setpoint &#39;&#39;&#39;
@@ -492,6 +557,56 @@ if __name__ == &#39;__main__&#39;:
 <li>builtins.BaseException</li>
 </ul>
 </dd>
+<dt id="pyhtcc.pyhtcc.FanMode"><code class="flex name class">
+<span>class <span class="ident">FanMode</span></span>
+<span>(</span><span>value, names=None, *, module=None, qualname=None, type=None, start=1)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Enum for which mode the fan is currently using</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class FanMode(enum.IntEnum):
+    &#39;&#39;&#39;
+    Enum for which mode the fan is currently using
+    &#39;&#39;&#39;
+    Auto = 0
+    On = 1
+    Circulate = 2
+    FollowSchedule = 3
+    Unknown = 4</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.IntEnum</li>
+<li>builtins.int</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="pyhtcc.pyhtcc.FanMode.Auto"><code class="name">var <span class="ident">Auto</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyhtcc.pyhtcc.FanMode.Circulate"><code class="name">var <span class="ident">Circulate</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyhtcc.pyhtcc.FanMode.FollowSchedule"><code class="name">var <span class="ident">FollowSchedule</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyhtcc.pyhtcc.FanMode.On"><code class="name">var <span class="ident">On</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyhtcc.pyhtcc.FanMode.Unknown"><code class="name">var <span class="ident">Unknown</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
 <dt id="pyhtcc.pyhtcc.LoginCredentialsInvalidError"><code class="flex name class">
 <span>class <span class="ident">LoginCredentialsInvalidError</span></span>
 <span>(</span><span>*args, **kwargs)</span>
@@ -783,7 +898,7 @@ if __name__ == &#39;__main__&#39;:
 <h3>Methods</h3>
 <dl>
 <dt id="pyhtcc.pyhtcc.PyHTCC.authenticate"><code class="name flex">
-<span>def <span class="ident">authenticate</span></span>(<span>self) ‑> NoneType</span>
+<span>def <span class="ident">authenticate</span></span>(<span>self) ‑> None</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Attempts to authenticate with mytotalconnectcomfort.com.
@@ -909,7 +1024,7 @@ sleep intervals if rate-limiting is preventing sign-on.</p></div>
 </details>
 </dd>
 <dt id="pyhtcc.pyhtcc.PyHTCC.submit_raw_control_changes"><code class="name flex">
-<span>def <span class="ident">submit_raw_control_changes</span></span>(<span>self, device_id: int, other_data: dict) ‑> NoneType</span>
+<span>def <span class="ident">submit_raw_control_changes</span></span>(<span>self, device_id: int, other_data: dict) ‑> None</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Simulates making changes to current thermostat settings in the UI via
@@ -972,6 +1087,71 @@ the SubmitControlScreenChanges/ endpoint.</p></div>
 <li>builtins.Exception</li>
 <li>builtins.BaseException</li>
 </ul>
+</dd>
+<dt id="pyhtcc.pyhtcc.SystemMode"><code class="flex name class">
+<span>class <span class="ident">SystemMode</span></span>
+<span>(</span><span>value, names=None, *, module=None, qualname=None, type=None, start=1)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Enum for which mode the system is currently using</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class SystemMode(enum.IntEnum):
+    &#39;&#39;&#39;
+    Enum for which mode the system is currently using
+    &#39;&#39;&#39;
+    EMHeat = 0
+    Heat = 1
+    Off = 2
+    Cool = 3
+    AutoHeat = 4
+    AutoCool = 5
+    SouthernAway = 6
+    Unknown = 7</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.IntEnum</li>
+<li>builtins.int</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="pyhtcc.pyhtcc.SystemMode.AutoCool"><code class="name">var <span class="ident">AutoCool</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyhtcc.pyhtcc.SystemMode.AutoHeat"><code class="name">var <span class="ident">AutoHeat</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyhtcc.pyhtcc.SystemMode.Cool"><code class="name">var <span class="ident">Cool</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyhtcc.pyhtcc.SystemMode.EMHeat"><code class="name">var <span class="ident">EMHeat</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyhtcc.pyhtcc.SystemMode.Heat"><code class="name">var <span class="ident">Heat</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyhtcc.pyhtcc.SystemMode.Off"><code class="name">var <span class="ident">Off</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyhtcc.pyhtcc.SystemMode.SouthernAway"><code class="name">var <span class="ident">SouthernAway</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="pyhtcc.pyhtcc.SystemMode.Unknown"><code class="name">var <span class="ident">Unknown</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
 </dd>
 <dt id="pyhtcc.pyhtcc.TooManyAttemptsError"><code class="flex name class">
 <span>class <span class="ident">TooManyAttemptsError</span></span>
@@ -1053,6 +1233,35 @@ Also takes in an authenticated instance of an PyHTCC object</p></div>
         disp_unit = self.zone_info[&#39;DispUnits&#39;]
         return f&#39;{raw}°{disp_unit}&#39;
 
+    def get_system_mode(self) -&gt; SystemMode:
+        &#39;&#39;&#39;
+        refreshes the cached zone information then returns the current system mode
+        &#39;&#39;&#39;
+        self.refresh_zone_info()
+        return SystemMode(self.zone_info[&#39;latestData&#39;][&#39;uiData&#39;][&#39;SystemSwitchPosition&#39;])
+
+    def is_equipment_output_on(self) -&gt; bool:
+        &#39;&#39;&#39;
+        Refreshes the cached zone information then Returns true if the EquipmentOutputStatus
+        is non 0. This typically meansthe system is heating/cooling.
+        &#39;&#39;&#39;
+        self.refresh_zone_info()
+        return bool(self.zone_info[&#39;latestData&#39;][&#39;uiData&#39;][&#39;EquipmentOutputStatus&#39;])
+
+    def is_calling_for_heat(self) -&gt; int:
+        &#39;&#39;&#39;
+        Refreshes the cached zone information and checks if the system mode is heating
+        &#39;&#39;&#39;
+        return self.get_system_mode() in (SystemMode.Heat, SystemMode.AutoHeat, SystemMode.EMHeat) and \
+            self.is_equipment_output_on()
+
+    def is_calling_for_cool(self) -&gt; int:
+        &#39;&#39;&#39;
+        Refreshes the cached zone information and checks if the system mode is cooling
+        &#39;&#39;&#39;
+        return self.get_system_mode() in (SystemMode.Cool, SystemMode.AutoCool) and \
+            self.is_equipment_output_on()
+
     def get_current_temperature_raw(self) -&gt; int:
         &#39;&#39;&#39; gets the current temperature via refreshing the cached zone information &#39;&#39;&#39;
         self.refresh_zone_info()
@@ -1065,6 +1274,20 @@ Also takes in an authenticated instance of an PyHTCC object</p></div>
         &#39;&#39;&#39; calls get_current_temperature_raw() then adds on a degree sign and the display unit &#39;&#39;&#39;
         raw = self.get_current_temperature_raw()
         return self._get_with_unit(raw)
+
+    def get_fan_mode(self) -&gt; FanMode:
+        &#39;&#39;&#39;
+        refreshes the cached zone information then returns the current FanMode
+        &#39;&#39;&#39;
+        self.refresh_zone_info()
+        return FanMode(self.zone_info[&#39;latestData&#39;][&#39;fanData&#39;][&#39;fanMode&#39;])
+
+    def is_fan_running(self) -&gt; bool:
+        &#39;&#39;&#39;
+        refreshes the cached zone information then returns True if the fan is running
+        &#39;&#39;&#39;
+        self.refresh_zone_info()
+        return bool(self.zone_info[&#39;latestData&#39;][&#39;fanData&#39;][&#39;fanIsRunning&#39;])
 
     def get_heat_setpoint_raw(self) -&gt; int:
         &#39;&#39;&#39; refreshes the cached zone information then returns the heat setpoint &#39;&#39;&#39;
@@ -1222,6 +1445,23 @@ Also takes in an authenticated instance of an PyHTCC object</p></div>
     raise KeyError(&#34;Temperature is unavailable&#34;)</code></pre>
 </details>
 </dd>
+<dt id="pyhtcc.pyhtcc.Zone.get_fan_mode"><code class="name flex">
+<span>def <span class="ident">get_fan_mode</span></span>(<span>self) ‑> <a title="pyhtcc.pyhtcc.FanMode" href="#pyhtcc.pyhtcc.FanMode">FanMode</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>refreshes the cached zone information then returns the current FanMode</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_fan_mode(self) -&gt; FanMode:
+    &#39;&#39;&#39;
+    refreshes the cached zone information then returns the current FanMode
+    &#39;&#39;&#39;
+    self.refresh_zone_info()
+    return FanMode(self.zone_info[&#39;latestData&#39;][&#39;fanData&#39;][&#39;fanMode&#39;])</code></pre>
+</details>
+</dd>
 <dt id="pyhtcc.pyhtcc.Zone.get_heat_setpoint"><code class="name flex">
 <span>def <span class="ident">get_heat_setpoint</span></span>(<span>self) ‑> str</span>
 </code></dt>
@@ -1296,8 +1536,95 @@ Also takes in an authenticated instance of an PyHTCC object</p></div>
     return self.zone_info[&#39;OutdoorTemperature&#39;]</code></pre>
 </details>
 </dd>
+<dt id="pyhtcc.pyhtcc.Zone.get_system_mode"><code class="name flex">
+<span>def <span class="ident">get_system_mode</span></span>(<span>self) ‑> <a title="pyhtcc.pyhtcc.SystemMode" href="#pyhtcc.pyhtcc.SystemMode">SystemMode</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>refreshes the cached zone information then returns the current system mode</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_system_mode(self) -&gt; SystemMode:
+    &#39;&#39;&#39;
+    refreshes the cached zone information then returns the current system mode
+    &#39;&#39;&#39;
+    self.refresh_zone_info()
+    return SystemMode(self.zone_info[&#39;latestData&#39;][&#39;uiData&#39;][&#39;SystemSwitchPosition&#39;])</code></pre>
+</details>
+</dd>
+<dt id="pyhtcc.pyhtcc.Zone.is_calling_for_cool"><code class="name flex">
+<span>def <span class="ident">is_calling_for_cool</span></span>(<span>self) ‑> int</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Refreshes the cached zone information and checks if the system mode is cooling</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_calling_for_cool(self) -&gt; int:
+    &#39;&#39;&#39;
+    Refreshes the cached zone information and checks if the system mode is cooling
+    &#39;&#39;&#39;
+    return self.get_system_mode() in (SystemMode.Cool, SystemMode.AutoCool) and \
+        self.is_equipment_output_on()</code></pre>
+</details>
+</dd>
+<dt id="pyhtcc.pyhtcc.Zone.is_calling_for_heat"><code class="name flex">
+<span>def <span class="ident">is_calling_for_heat</span></span>(<span>self) ‑> int</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Refreshes the cached zone information and checks if the system mode is heating</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_calling_for_heat(self) -&gt; int:
+    &#39;&#39;&#39;
+    Refreshes the cached zone information and checks if the system mode is heating
+    &#39;&#39;&#39;
+    return self.get_system_mode() in (SystemMode.Heat, SystemMode.AutoHeat, SystemMode.EMHeat) and \
+        self.is_equipment_output_on()</code></pre>
+</details>
+</dd>
+<dt id="pyhtcc.pyhtcc.Zone.is_equipment_output_on"><code class="name flex">
+<span>def <span class="ident">is_equipment_output_on</span></span>(<span>self) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Refreshes the cached zone information then Returns true if the EquipmentOutputStatus
+is non 0. This typically meansthe system is heating/cooling.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_equipment_output_on(self) -&gt; bool:
+    &#39;&#39;&#39;
+    Refreshes the cached zone information then Returns true if the EquipmentOutputStatus
+    is non 0. This typically meansthe system is heating/cooling.
+    &#39;&#39;&#39;
+    self.refresh_zone_info()
+    return bool(self.zone_info[&#39;latestData&#39;][&#39;uiData&#39;][&#39;EquipmentOutputStatus&#39;])</code></pre>
+</details>
+</dd>
+<dt id="pyhtcc.pyhtcc.Zone.is_fan_running"><code class="name flex">
+<span>def <span class="ident">is_fan_running</span></span>(<span>self) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>refreshes the cached zone information then returns True if the fan is running</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_fan_running(self) -&gt; bool:
+    &#39;&#39;&#39;
+    refreshes the cached zone information then returns True if the fan is running
+    &#39;&#39;&#39;
+    self.refresh_zone_info()
+    return bool(self.zone_info[&#39;latestData&#39;][&#39;fanData&#39;][&#39;fanIsRunning&#39;])</code></pre>
+</details>
+</dd>
 <dt id="pyhtcc.pyhtcc.Zone.refresh_zone_info"><code class="name flex">
-<span>def <span class="ident">refresh_zone_info</span></span>(<span>self) ‑> NoneType</span>
+<span>def <span class="ident">refresh_zone_info</span></span>(<span>self) ‑> None</span>
 </code></dt>
 <dd>
 <div class="desc"><p>refreshes the zone_info attribute</p></div>
@@ -1318,7 +1645,7 @@ Also takes in an authenticated instance of an PyHTCC object</p></div>
 </details>
 </dd>
 <dt id="pyhtcc.pyhtcc.Zone.set_permananent_cool_setpoint"><code class="name flex">
-<span>def <span class="ident">set_permananent_cool_setpoint</span></span>(<span>self, temp: int) ‑> NoneType</span>
+<span>def <span class="ident">set_permananent_cool_setpoint</span></span>(<span>self, temp: int) ‑> None</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Sets a new permananet cool setpoint.
@@ -1342,7 +1669,7 @@ This will also attempt to turn the thermostat to 'Cool'</p></div>
 </details>
 </dd>
 <dt id="pyhtcc.pyhtcc.Zone.set_permananent_heat_setpoint"><code class="name flex">
-<span>def <span class="ident">set_permananent_heat_setpoint</span></span>(<span>self, temp: int) ‑> NoneType</span>
+<span>def <span class="ident">set_permananent_heat_setpoint</span></span>(<span>self, temp: int) ‑> None</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Sets a new permananet heat setpoint.
@@ -1366,7 +1693,7 @@ This will also attempt to turn the thermostat to 'Heat'</p></div>
 </details>
 </dd>
 <dt id="pyhtcc.pyhtcc.Zone.submit_control_changes"><code class="name flex">
-<span>def <span class="ident">submit_control_changes</span></span>(<span>self, data: dict) ‑> NoneType</span>
+<span>def <span class="ident">submit_control_changes</span></span>(<span>self, data: dict) ‑> None</span>
 </code></dt>
 <dd>
 <div class="desc"><p>This is a low-level API call to PyHTCC.submit_raw_control_changes().
@@ -1384,7 +1711,7 @@ More likely than not, most users need not use this call directly.</p></div>
 </details>
 </dd>
 <dt id="pyhtcc.pyhtcc.Zone.turn_fan_auto"><code class="name flex">
-<span>def <span class="ident">turn_fan_auto</span></span>(<span>self) ‑> NoneType</span>
+<span>def <span class="ident">turn_fan_auto</span></span>(<span>self) ‑> None</span>
 </code></dt>
 <dd>
 <div class="desc"><p>turns the fan to auto</p></div>
@@ -1401,7 +1728,7 @@ More likely than not, most users need not use this call directly.</p></div>
 </details>
 </dd>
 <dt id="pyhtcc.pyhtcc.Zone.turn_fan_circulate"><code class="name flex">
-<span>def <span class="ident">turn_fan_circulate</span></span>(<span>self) ‑> NoneType</span>
+<span>def <span class="ident">turn_fan_circulate</span></span>(<span>self) ‑> None</span>
 </code></dt>
 <dd>
 <div class="desc"><p>turns the fan to circulate</p></div>
@@ -1418,7 +1745,7 @@ More likely than not, most users need not use this call directly.</p></div>
 </details>
 </dd>
 <dt id="pyhtcc.pyhtcc.Zone.turn_fan_on"><code class="name flex">
-<span>def <span class="ident">turn_fan_on</span></span>(<span>self) ‑> NoneType</span>
+<span>def <span class="ident">turn_fan_on</span></span>(<span>self) ‑> None</span>
 </code></dt>
 <dd>
 <div class="desc"><p>turns the fan on</p></div>
@@ -1435,7 +1762,7 @@ More likely than not, most users need not use this call directly.</p></div>
 </details>
 </dd>
 <dt id="pyhtcc.pyhtcc.Zone.turn_system_off"><code class="name flex">
-<span>def <span class="ident">turn_system_off</span></span>(<span>self) ‑> NoneType</span>
+<span>def <span class="ident">turn_system_off</span></span>(<span>self) ‑> None</span>
 </code></dt>
 <dd>
 <div class="desc"><p>turns this thermostat off</p></div>
@@ -1494,6 +1821,16 @@ More likely than not, most users need not use this call directly.</p></div>
 <h4><code><a title="pyhtcc.pyhtcc.AuthenticationError" href="#pyhtcc.pyhtcc.AuthenticationError">AuthenticationError</a></code></h4>
 </li>
 <li>
+<h4><code><a title="pyhtcc.pyhtcc.FanMode" href="#pyhtcc.pyhtcc.FanMode">FanMode</a></code></h4>
+<ul class="">
+<li><code><a title="pyhtcc.pyhtcc.FanMode.Auto" href="#pyhtcc.pyhtcc.FanMode.Auto">Auto</a></code></li>
+<li><code><a title="pyhtcc.pyhtcc.FanMode.Circulate" href="#pyhtcc.pyhtcc.FanMode.Circulate">Circulate</a></code></li>
+<li><code><a title="pyhtcc.pyhtcc.FanMode.FollowSchedule" href="#pyhtcc.pyhtcc.FanMode.FollowSchedule">FollowSchedule</a></code></li>
+<li><code><a title="pyhtcc.pyhtcc.FanMode.On" href="#pyhtcc.pyhtcc.FanMode.On">On</a></code></li>
+<li><code><a title="pyhtcc.pyhtcc.FanMode.Unknown" href="#pyhtcc.pyhtcc.FanMode.Unknown">Unknown</a></code></li>
+</ul>
+</li>
+<li>
 <h4><code><a title="pyhtcc.pyhtcc.LoginCredentialsInvalidError" href="#pyhtcc.pyhtcc.LoginCredentialsInvalidError">LoginCredentialsInvalidError</a></code></h4>
 </li>
 <li>
@@ -1513,6 +1850,19 @@ More likely than not, most users need not use this call directly.</p></div>
 <h4><code><a title="pyhtcc.pyhtcc.RedirectDidNotHappenError" href="#pyhtcc.pyhtcc.RedirectDidNotHappenError">RedirectDidNotHappenError</a></code></h4>
 </li>
 <li>
+<h4><code><a title="pyhtcc.pyhtcc.SystemMode" href="#pyhtcc.pyhtcc.SystemMode">SystemMode</a></code></h4>
+<ul class="two-column">
+<li><code><a title="pyhtcc.pyhtcc.SystemMode.AutoCool" href="#pyhtcc.pyhtcc.SystemMode.AutoCool">AutoCool</a></code></li>
+<li><code><a title="pyhtcc.pyhtcc.SystemMode.AutoHeat" href="#pyhtcc.pyhtcc.SystemMode.AutoHeat">AutoHeat</a></code></li>
+<li><code><a title="pyhtcc.pyhtcc.SystemMode.Cool" href="#pyhtcc.pyhtcc.SystemMode.Cool">Cool</a></code></li>
+<li><code><a title="pyhtcc.pyhtcc.SystemMode.EMHeat" href="#pyhtcc.pyhtcc.SystemMode.EMHeat">EMHeat</a></code></li>
+<li><code><a title="pyhtcc.pyhtcc.SystemMode.Heat" href="#pyhtcc.pyhtcc.SystemMode.Heat">Heat</a></code></li>
+<li><code><a title="pyhtcc.pyhtcc.SystemMode.Off" href="#pyhtcc.pyhtcc.SystemMode.Off">Off</a></code></li>
+<li><code><a title="pyhtcc.pyhtcc.SystemMode.SouthernAway" href="#pyhtcc.pyhtcc.SystemMode.SouthernAway">SouthernAway</a></code></li>
+<li><code><a title="pyhtcc.pyhtcc.SystemMode.Unknown" href="#pyhtcc.pyhtcc.SystemMode.Unknown">Unknown</a></code></li>
+</ul>
+</li>
+<li>
 <h4><code><a title="pyhtcc.pyhtcc.TooManyAttemptsError" href="#pyhtcc.pyhtcc.TooManyAttemptsError">TooManyAttemptsError</a></code></h4>
 </li>
 <li>
@@ -1522,11 +1872,17 @@ More likely than not, most users need not use this call directly.</p></div>
 <li><code><a title="pyhtcc.pyhtcc.Zone.get_cool_setpoint_raw" href="#pyhtcc.pyhtcc.Zone.get_cool_setpoint_raw">get_cool_setpoint_raw</a></code></li>
 <li><code><a title="pyhtcc.pyhtcc.Zone.get_current_temperature" href="#pyhtcc.pyhtcc.Zone.get_current_temperature">get_current_temperature</a></code></li>
 <li><code><a title="pyhtcc.pyhtcc.Zone.get_current_temperature_raw" href="#pyhtcc.pyhtcc.Zone.get_current_temperature_raw">get_current_temperature_raw</a></code></li>
+<li><code><a title="pyhtcc.pyhtcc.Zone.get_fan_mode" href="#pyhtcc.pyhtcc.Zone.get_fan_mode">get_fan_mode</a></code></li>
 <li><code><a title="pyhtcc.pyhtcc.Zone.get_heat_setpoint" href="#pyhtcc.pyhtcc.Zone.get_heat_setpoint">get_heat_setpoint</a></code></li>
 <li><code><a title="pyhtcc.pyhtcc.Zone.get_heat_setpoint_raw" href="#pyhtcc.pyhtcc.Zone.get_heat_setpoint_raw">get_heat_setpoint_raw</a></code></li>
 <li><code><a title="pyhtcc.pyhtcc.Zone.get_name" href="#pyhtcc.pyhtcc.Zone.get_name">get_name</a></code></li>
 <li><code><a title="pyhtcc.pyhtcc.Zone.get_outdoor_temperature" href="#pyhtcc.pyhtcc.Zone.get_outdoor_temperature">get_outdoor_temperature</a></code></li>
 <li><code><a title="pyhtcc.pyhtcc.Zone.get_outdoor_temperature_raw" href="#pyhtcc.pyhtcc.Zone.get_outdoor_temperature_raw">get_outdoor_temperature_raw</a></code></li>
+<li><code><a title="pyhtcc.pyhtcc.Zone.get_system_mode" href="#pyhtcc.pyhtcc.Zone.get_system_mode">get_system_mode</a></code></li>
+<li><code><a title="pyhtcc.pyhtcc.Zone.is_calling_for_cool" href="#pyhtcc.pyhtcc.Zone.is_calling_for_cool">is_calling_for_cool</a></code></li>
+<li><code><a title="pyhtcc.pyhtcc.Zone.is_calling_for_heat" href="#pyhtcc.pyhtcc.Zone.is_calling_for_heat">is_calling_for_heat</a></code></li>
+<li><code><a title="pyhtcc.pyhtcc.Zone.is_equipment_output_on" href="#pyhtcc.pyhtcc.Zone.is_equipment_output_on">is_equipment_output_on</a></code></li>
+<li><code><a title="pyhtcc.pyhtcc.Zone.is_fan_running" href="#pyhtcc.pyhtcc.Zone.is_fan_running">is_fan_running</a></code></li>
 <li><code><a title="pyhtcc.pyhtcc.Zone.refresh_zone_info" href="#pyhtcc.pyhtcc.Zone.refresh_zone_info">refresh_zone_info</a></code></li>
 <li><code><a title="pyhtcc.pyhtcc.Zone.set_permananent_cool_setpoint" href="#pyhtcc.pyhtcc.Zone.set_permananent_cool_setpoint">set_permananent_cool_setpoint</a></code></li>
 <li><code><a title="pyhtcc.pyhtcc.Zone.set_permananent_heat_setpoint" href="#pyhtcc.pyhtcc.Zone.set_permananent_heat_setpoint">set_permananent_heat_setpoint</a></code></li>
@@ -1546,7 +1902,7 @@ More likely than not, most users need not use this call directly.</p></div>
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.2</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
 </footer>
 </body>
 </html>
