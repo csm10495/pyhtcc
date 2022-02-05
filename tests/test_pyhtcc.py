@@ -9,8 +9,8 @@ import unittest.mock
 import pytest
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
-from pyhtcc import (AuthenticationError, LoginCredentialsInvalidError, LoginUnexpectedError, PyHTCC,
-                    RedirectDidNotHappenError, TooManyAttemptsError, Zone,
+from pyhtcc import (AuthenticationError, FanMode, LoginCredentialsInvalidError, LoginUnexpectedError, PyHTCC,
+                    RedirectDidNotHappenError, SystemMode, TooManyAttemptsError, Zone,
                     ZoneNotFoundError)
 
 
@@ -289,6 +289,13 @@ class TestPyHTCC:
         assert zone.turn_system_off()
         assert zone.set_permananent_cool_setpoint(1)
         assert zone.set_permananent_heat_setpoint(2)
+
+        assert zone.get_system_mode() == SystemMode.Cool
+        assert zone.is_equipment_output_on() is True
+        assert zone.is_calling_for_heat() is False
+        assert zone.is_calling_for_cool() is True
+        assert zone.get_fan_mode() == FanMode.Auto
+        assert zone.is_fan_running() is True
 
     def test_setting_location_id_via_url(self):
         result = unittest.mock.MagicMock()

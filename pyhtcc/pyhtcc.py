@@ -1,8 +1,7 @@
 '''
 Holds implementation guts for PyHTCC
 '''
-import argparse
-import json
+import enum
 import os
 import re
 import time
@@ -38,6 +37,29 @@ class RedirectDidNotHappenError(EnvironmentError):
 class ZoneNotFoundError(EnvironmentError):
     ''' raised if the zone could not be found on refresh '''
     pass
+
+class SystemMode(enum.IntEnum):
+    '''
+    Enum for which mode the system is currently using
+    '''
+    EMHeat = 0
+    Heat = 1
+    Off = 2
+    Cool = 3
+    AutoHeat = 4
+    AutoCool = 5
+    SouthernAway = 6
+    Unknown = 7
+
+class FanMode(enum.IntEnum):
+    '''
+    Enum for which mode the fan is currently using
+    '''
+    Auto = 0
+    On = 1
+    Circulate = 2
+    FollowSchedule = 3
+    Unknown = 4
 
 class Zone:
     '''
@@ -84,32 +106,34 @@ class Zone:
         disp_unit = self.zone_info['DispUnits']
         return f'{raw}°{disp_unit}'
 
-    def get_system_state(self) -> int:
+    def get_system_mode(self) -> SystemMode:
         '''
         refreshes the cached zone information then returns the current system mode
-	0, HEAT: 1, OFF: 2, COOL: 3, AUTOHEAT: 4, AUTOCOOL: 5, SOUTHERN_AWAY: 6, UNKNOWN: 7
         '''
         self.refresh_zone_info()
-        return int(self.zone_info['latestData']['uiData']['SystemSwitchPosition'])
+        return SystemMode(self.zone_info['latestData']['uiData']['SystemSwitchPosition'])
 
-    def get_call_for_heat_state(self) -> int:
+    def is_equipment_output_on(self) -> bool:
         '''
-        refreshes the cached zone information then returns the call for heat state
-        0 = No Call for Heat, 1 = Calling for Heat
+        Refreshes the cached zone information then Returns true if the EquipmentOutputStatus
+        is non 0. This typically meansthe system is heating/cooling.
         '''
-        sys_mode = self.get_system_state() # zone info refreshed via this call
-        if(sys_mode == 1): # Heat
-            return int(self.zone_info['latestData']['uiData']['EquipmentOutputStatus'])
+        self.refresh_zone_info()
+        return bool(self.zone_info['latestData']['uiData']['EquipmentOutputStatus'])
 
-    def get_call_for_cool_state(self) -> int:
+    def is_calling_for_heat(self) -> int:
         '''
-        refreshes the cached zone information then returns the call for cool state
-        0 = No Call for Cool, 1 = Calling for Cool
+        Refreshes the cached zone information and checks if the system mode is heating
         '''
-        sys_mode = self.get_system_state() # zone info refreshed via this call
-        if(sys_mode == 3): # Cool
-            return int(self.zone_info['latestData']['uiData']['EquipmentOutputStatus'])
+        return self.get_system_mode() in (SystemMode.Heat, SystemMode.AutoHeat, SystemMode.EMHeat) and \
+            self.is_equipment_output_on()
 
+    def is_calling_for_cool(self) -> int:
+        '''
+        Refreshes the cached zone information and checks if the system mode is cooling
+        '''
+        return self.get_system_mode() in (SystemMode.Cool, SystemMode.AutoCool) and \
+            self.is_equipment_output_on()
 
     def get_current_temperature_raw(self) -> int:
         ''' gets the current temperature via refreshing the cached zone information '''
@@ -124,21 +148,19 @@ class Zone:
         raw = self.get_current_temperature_raw()
         return self._get_with_unit(raw)
 
-    def get_fan_mode(self) -> int:
+    def get_fan_mode(self) -> FanMode:
         '''
-        refreshes the cached zone information then returns the current fan mode
-        Auto: 0, On: 1, Circulate: 2, FollowSchedule: 3, Unknown: 4
+        refreshes the cached zone information then returns the current FanMode
         '''
         self.refresh_zone_info()
-        return int(self.zone_info['latestData']['fanData']['fanMode'])
+        return FanMode(self.zone_info['latestData']['fanData']['fanMode'])
 
-    def get_fan_running_state(self) -> int:
+    def is_fan_running(self) -> bool:
         '''
-        refreshes the cached zone information then returns the current fan state
-        0 = Off, 1 = On
+        refreshes the cached zone information then returns True if the fan is running
         '''
         self.refresh_zone_info()
-        return int(self.zone_info['latestData']['fanData']['fanIsRunning'])
+        return bool(self.zone_info['latestData']['fanData']['fanIsRunning'])
 
     def get_heat_setpoint_raw(self) -> int:
         ''' refreshes the cached zone information then returns the heat setpoint '''

@@ -30,7 +30,7 @@ jobs:
         python3 -m pip install gspread -U
         python3 -m pip install .
 
-        sudo python3 generate_docs.py
+        python3 generate_docs.py
 
         git config user.name "GitHub Actions Bot"
         git config user.email "<>"
