@@ -1,3 +1,4 @@
+
 '''
 Holds implementation guts for PyHTCC
 '''
@@ -180,17 +181,34 @@ class Zone:
     def get_cool_setpoint(self) -> str:
         ''' calls get_cool_setpoint_raw() then adds on a degree sign and the display unit '''
         raw = self.get_cool_setpoint_raw()
-        return self._get_with_unit(raw)
 
     def get_outdoor_temperature_raw(self) -> int:
         ''' refreshes the cached zone information then returns the outdoor temperature raw value '''
-        self.refresh_zone_info()
-        return self.zone_info['OutdoorTemperature']
 
     def get_outdoor_temperature(self) -> str:
         ''' calls get_outdoor_temperature_raw() then returns it with a degree sign and the display unit '''
         raw = self.get_outdoor_temperature_raw()
         return self._get_with_unit(raw)
+
+    def get_indoor_temperature_raw(self) -> int:
+        ''' refreshes the cached zone information then returns the indoor temperature raw value '''
+        self.refresh_zone_info()
+        return self.zone_info['latestData']['uiData']['DispTemperature']
+
+    def get_indoor_temperature(self) -> str:
+        ''' calls get_indoor_temperature_raw() then returns it with a degree sign and the Display unit '''
+        raw = self.get_indoor_temperature_raw()
+        return self._get_with_unit(raw)
+
+    def get_indoor_humidity_raw(self) -> int:
+        ''' refreshes the cached zone information then returns the indoor humidity raw value '''
+        self.refresh_zone_info()
+        return self.zone_info['latestData']['uiData']['IndoorHumidity']
+
+    def get_indoor_humidity(self) -> str:
+        ''' calls get_indoor_humidity_raw() then returns it with a % display unit '''
+        raw = self.get_indoor_humidity_raw()
+        return str(raw) + str("%")
 
     def submit_control_changes(self, data:dict) -> None:
         '''
