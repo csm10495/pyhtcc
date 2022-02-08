@@ -181,9 +181,12 @@ class Zone:
     def get_cool_setpoint(self) -> str:
         ''' calls get_cool_setpoint_raw() then adds on a degree sign and the display unit '''
         raw = self.get_cool_setpoint_raw()
+        return self._get_with_unit(raw)
 
     def get_outdoor_temperature_raw(self) -> int:
         ''' refreshes the cached zone information then returns the outdoor temperature raw value '''
+        self.refresh_zone_info()
+        return self.zone_info['OutdoorTemperature']
 
     def get_outdoor_temperature(self) -> str:
         ''' calls get_outdoor_temperature_raw() then returns it with a degree sign and the display unit '''
