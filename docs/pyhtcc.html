@@ -221,6 +221,26 @@ class Zone:
         raw = self.get_outdoor_temperature_raw()
         return self._get_with_unit(raw)
 
+    def get_indoor_temperature_raw(self) -&gt; int:
+        &#39;&#39;&#39; refreshes the cached zone information then returns the indoor temperature raw value &#39;&#39;&#39;
+        self.refresh_zone_info()
+        return self.zone_info[&#39;latestData&#39;][&#39;uiData&#39;][&#39;DispTemperature&#39;]
+
+    def get_indoor_temperature(self) -&gt; str:
+        &#39;&#39;&#39; calls get_indoor_temperature_raw() then returns it with a degree sign and the Display unit &#39;&#39;&#39;
+        raw = self.get_indoor_temperature_raw()
+        return self._get_with_unit(raw)
+
+    def get_indoor_humidity_raw(self) -&gt; int:
+        &#39;&#39;&#39; refreshes the cached zone information then returns the indoor humidity raw value &#39;&#39;&#39;
+        self.refresh_zone_info()
+        return self.zone_info[&#39;latestData&#39;][&#39;uiData&#39;][&#39;IndoorHumidity&#39;]
+
+    def get_indoor_humidity(self) -&gt; str:
+        &#39;&#39;&#39; calls get_indoor_humidity_raw() then returns it with a % display unit &#39;&#39;&#39;
+        raw = self.get_indoor_humidity_raw()
+        return str(raw) + str(&#34;%&#34;)
+
     def submit_control_changes(self, data:dict) -&gt; None:
         &#39;&#39;&#39;
         This is a low-level API call to PyHTCC.submit_raw_control_changes().
@@ -1319,6 +1339,26 @@ Also takes in an authenticated instance of an PyHTCC object</p></div>
         raw = self.get_outdoor_temperature_raw()
         return self._get_with_unit(raw)
 
+    def get_indoor_temperature_raw(self) -&gt; int:
+        &#39;&#39;&#39; refreshes the cached zone information then returns the indoor temperature raw value &#39;&#39;&#39;
+        self.refresh_zone_info()
+        return self.zone_info[&#39;latestData&#39;][&#39;uiData&#39;][&#39;DispTemperature&#39;]
+
+    def get_indoor_temperature(self) -&gt; str:
+        &#39;&#39;&#39; calls get_indoor_temperature_raw() then returns it with a degree sign and the Display unit &#39;&#39;&#39;
+        raw = self.get_indoor_temperature_raw()
+        return self._get_with_unit(raw)
+
+    def get_indoor_humidity_raw(self) -&gt; int:
+        &#39;&#39;&#39; refreshes the cached zone information then returns the indoor humidity raw value &#39;&#39;&#39;
+        self.refresh_zone_info()
+        return self.zone_info[&#39;latestData&#39;][&#39;uiData&#39;][&#39;IndoorHumidity&#39;]
+
+    def get_indoor_humidity(self) -&gt; str:
+        &#39;&#39;&#39; calls get_indoor_humidity_raw() then returns it with a % display unit &#39;&#39;&#39;
+        raw = self.get_indoor_humidity_raw()
+        return str(raw) + str(&#34;%&#34;)
+
     def submit_control_changes(self, data:dict) -&gt; None:
         &#39;&#39;&#39;
         This is a low-level API call to PyHTCC.submit_raw_control_changes().
@@ -1490,6 +1530,66 @@ Also takes in an authenticated instance of an PyHTCC object</p></div>
     &#39;&#39;&#39; refreshes the cached zone information then returns the heat setpoint &#39;&#39;&#39;
     self.refresh_zone_info()
     return int(self.zone_info[&#39;latestData&#39;][&#39;uiData&#39;][&#39;HeatSetpoint&#39;])</code></pre>
+</details>
+</dd>
+<dt id="pyhtcc.pyhtcc.Zone.get_indoor_humidity"><code class="name flex">
+<span>def <span class="ident">get_indoor_humidity</span></span>(<span>self) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>calls get_indoor_humidity_raw() then returns it with a % display unit</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_indoor_humidity(self) -&gt; str:
+    &#39;&#39;&#39; calls get_indoor_humidity_raw() then returns it with a % display unit &#39;&#39;&#39;
+    raw = self.get_indoor_humidity_raw()
+    return str(raw) + str(&#34;%&#34;)</code></pre>
+</details>
+</dd>
+<dt id="pyhtcc.pyhtcc.Zone.get_indoor_humidity_raw"><code class="name flex">
+<span>def <span class="ident">get_indoor_humidity_raw</span></span>(<span>self) ‑> int</span>
+</code></dt>
+<dd>
+<div class="desc"><p>refreshes the cached zone information then returns the indoor humidity raw value</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_indoor_humidity_raw(self) -&gt; int:
+    &#39;&#39;&#39; refreshes the cached zone information then returns the indoor humidity raw value &#39;&#39;&#39;
+    self.refresh_zone_info()
+    return self.zone_info[&#39;latestData&#39;][&#39;uiData&#39;][&#39;IndoorHumidity&#39;]</code></pre>
+</details>
+</dd>
+<dt id="pyhtcc.pyhtcc.Zone.get_indoor_temperature"><code class="name flex">
+<span>def <span class="ident">get_indoor_temperature</span></span>(<span>self) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>calls get_indoor_temperature_raw() then returns it with a degree sign and the Display unit</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_indoor_temperature(self) -&gt; str:
+    &#39;&#39;&#39; calls get_indoor_temperature_raw() then returns it with a degree sign and the Display unit &#39;&#39;&#39;
+    raw = self.get_indoor_temperature_raw()
+    return self._get_with_unit(raw)</code></pre>
+</details>
+</dd>
+<dt id="pyhtcc.pyhtcc.Zone.get_indoor_temperature_raw"><code class="name flex">
+<span>def <span class="ident">get_indoor_temperature_raw</span></span>(<span>self) ‑> int</span>
+</code></dt>
+<dd>
+<div class="desc"><p>refreshes the cached zone information then returns the indoor temperature raw value</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_indoor_temperature_raw(self) -&gt; int:
+    &#39;&#39;&#39; refreshes the cached zone information then returns the indoor temperature raw value &#39;&#39;&#39;
+    self.refresh_zone_info()
+    return self.zone_info[&#39;latestData&#39;][&#39;uiData&#39;][&#39;DispTemperature&#39;]</code></pre>
 </details>
 </dd>
 <dt id="pyhtcc.pyhtcc.Zone.get_name"><code class="name flex">
@@ -1875,6 +1975,10 @@ More likely than not, most users need not use this call directly.</p></div>
 <li><code><a title="pyhtcc.pyhtcc.Zone.get_fan_mode" href="#pyhtcc.pyhtcc.Zone.get_fan_mode">get_fan_mode</a></code></li>
 <li><code><a title="pyhtcc.pyhtcc.Zone.get_heat_setpoint" href="#pyhtcc.pyhtcc.Zone.get_heat_setpoint">get_heat_setpoint</a></code></li>
 <li><code><a title="pyhtcc.pyhtcc.Zone.get_heat_setpoint_raw" href="#pyhtcc.pyhtcc.Zone.get_heat_setpoint_raw">get_heat_setpoint_raw</a></code></li>
+<li><code><a title="pyhtcc.pyhtcc.Zone.get_indoor_humidity" href="#pyhtcc.pyhtcc.Zone.get_indoor_humidity">get_indoor_humidity</a></code></li>
+<li><code><a title="pyhtcc.pyhtcc.Zone.get_indoor_humidity_raw" href="#pyhtcc.pyhtcc.Zone.get_indoor_humidity_raw">get_indoor_humidity_raw</a></code></li>
+<li><code><a title="pyhtcc.pyhtcc.Zone.get_indoor_temperature" href="#pyhtcc.pyhtcc.Zone.get_indoor_temperature">get_indoor_temperature</a></code></li>
+<li><code><a title="pyhtcc.pyhtcc.Zone.get_indoor_temperature_raw" href="#pyhtcc.pyhtcc.Zone.get_indoor_temperature_raw">get_indoor_temperature_raw</a></code></li>
 <li><code><a title="pyhtcc.pyhtcc.Zone.get_name" href="#pyhtcc.pyhtcc.Zone.get_name">get_name</a></code></li>
 <li><code><a title="pyhtcc.pyhtcc.Zone.get_outdoor_temperature" href="#pyhtcc.pyhtcc.Zone.get_outdoor_temperature">get_outdoor_temperature</a></code></li>
 <li><code><a title="pyhtcc.pyhtcc.Zone.get_outdoor_temperature_raw" href="#pyhtcc.pyhtcc.Zone.get_outdoor_temperature_raw">get_outdoor_temperature_raw</a></code></li>
