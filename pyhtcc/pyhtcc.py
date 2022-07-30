@@ -386,13 +386,13 @@ class PyHTCC:
 
         text_data = result.text
         try:
-            outdoor_temp = int(text_data.split('Control.Model.Property.outdoorTemp,')[1].split(')', 1)[0])
+            outdoor_temp = int(float(text_data.split('Control.Model.Property.outdoorTemp,')[1].split(')', 1)[0].strip()))
         except:
             logger.exception("Unable to find the outdoor temperature.")
             outdoor_temp = None
 
         try:
-            outdoor_humidity = int(text_data.split('Control.Model.Property.outdoorHumidity,')[1].split(')', 1)[0])
+            outdoor_humidity = int(float(text_data.split('Control.Model.Property.outdoorHumidity,')[1].split(')', 1)[0].strip()))
         except:
             logger.exception("Unable to find the outdoor humidity.")
             outdoor_humidity = None

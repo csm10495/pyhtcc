@@ -122,6 +122,21 @@ class TestPyHTCC:
             'OutdoorHumidity' : 47,
         }
 
+    def test_getting_outdoor_weather_for_zone_as_float_back_to_int(self):
+            result = unittest.mock.Mock()
+            # put data in that is part of the actual response that we care about
+            result.text = '''        Control.Model.set(Control.Model.Property.isInVacationHoldMode, false);
+            Control.Model.set(Control.Model.Property.outdoorHumidity,  47.0000);
+            Control.Model.set(Control.Model.Property.outdoorTemp, 74.0000);
+            Control.Model.set(Control.Model.Property.schedCoolSp, 78.0000);'''
+            self.mock_get_result(result)
+
+            info = self.pyhtcc._get_outdoor_weather_info_for_zone(0)
+            assert info == {
+                'OutdoorTemperature' : 74,
+                'OutdoorHumidity' : 47,
+            }
+
     def test_getting_outdoor_weather_for_zone_no_temp(self):
         result = unittest.mock.Mock()
         # put data in that is part of the actual response that we care about
