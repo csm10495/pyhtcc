@@ -31,6 +31,7 @@
 Holds implementation guts for PyHTCC
 &#39;&#39;&#39;
 import enum
+import functools
 import os
 import re
 import time
@@ -38,7 +39,7 @@ import typing
 
 import requests  # depends
 # logging setup
-from csmlog import enableConsoleLogging, getLogger, setup  # depends
+from csmlog import getLogger, setup  # depends
 
 setup(&#39;pyhtcc&#39;)
 logger = getLogger(__file__)
@@ -315,9 +316,6 @@ class PyHTCC:
         self.password = password
         self._locationId = None
 
-        # cache the device_id -&gt; name mapping since it won&#39;t change
-        self._device_id_to_name = {}
-
         # self.session will be created in authenticate()
         self.authenticate()
 
@@ -333,7 +331,7 @@ class PyHTCC:
             logger.debug(f&#34;Starting authentication attempt #{i + 1}&#34;)
             try:
                 return self._do_authenticate()
-            except (TooManyAttemptsError, RedirectDidNotHappenError, LoginUnexpectedError) as ex:
+            except (TooManyAttemptsError, RedirectDidNotHappenError, LoginUnexpectedError):
                 logger.exception(&#34;Unable to authenticate at this moment&#34;)
                 num_seconds = 2 ** i
                 logger.debug(f&#34;Sleeping for {num_seconds} seconds&#34;)
@@ -388,22 +386,20 @@ class PyHTCC:
 
         logger.debug(f&#34;location id is {self._locationId}&#34;)
 
+    @functools.lru_cache(maxsize=None)
     def _get_name_for_device_id(self, device_id:int) -&gt; str:
         &#39;&#39;&#39;
         Will ask via the api for the name corresponding with the device id.
         Note that this actually greps the html for the name.
         Note that this will only perform an HTTP request if we don&#39;t already have this device_id&#39;s name cached
         &#39;&#39;&#39;
+        # grab the name from the portal
+        result = self.session.get(f&#39;https://mytotalconnectcomfort.com/portal/Device/Control/{device_id}?page=1&#39;)
+        result.raise_for_status()
 
-        if device_id not in self._device_id_to_name:
-            # grab the name from the portal
-            result = self.session.get(f&#39;https://mytotalconnectcomfort.com/portal/Device/Control/{device_id}?page=1&#39;)
-            self._device_id_to_name[device_id] = re.findall(r&#39;id=\s?&#34;ZoneName&#34;\s?&gt;(.*) Control&lt;&#39;, result.text)[0]
-            logger.debug(f&#34;Called portal to say {device_id} -&gt; {self._device_id_to_name[device_id]}&#34;)
-        else:
-            logger.debug(f&#34;Used cache to say {device_id} -&gt; {self._device_id_to_name[device_id]}&#34;)
-
-        return self._device_id_to_name[device_id]
+        name = re.findall(r&#39;id=\s?&#34;ZoneName&#34;\s?&gt;(.*) Control&lt;&#39;, result.text)[0]
+        logger.debug(f&#34;Called portal to say {device_id} -&gt; {name}&#34;)
+        return name
 
     def _get_outdoor_weather_info_for_zone(self, device_id:int) -&gt; dict:
         &#39;&#39;&#39;
@@ -455,7 +451,7 @@ class PyHTCC:
 
             try:
                 data = result.json()
-            except Exception as ex:
+            except Exception:
                 # we can get a 200 with non-json data if pages aren&#39;t needed. Though the 1st page shouldn&#39;t give non-json.
                 if page_num == 1:
                     logger.exception(f&#34;Unable to decode json data returned by GetZoneList. Data was:\n {result.text}&#34;)
@@ -481,8 +477,8 @@ class PyHTCC:
 
             try:
                 more_data = result.json()
-            except Exception as ex:
-                logger.exception(&#34;Unable to decode json data returned by CheckDataSession. Data was:\n {result.text}&#34;)
+            except Exception:
+                logger.exception(f&#34;Unable to decode json data returned by CheckDataSession. Data was:\n {result.text}&#34;)
                 raise
 
             zones[idx] = {**zone, **more_data, **self._get_outdoor_weather_info_for_zone(device_id)}
@@ -510,7 +506,7 @@ class PyHTCC:
     def submit_raw_control_changes(self, device_id:int, other_data:dict) -&gt; None:
         &#39;&#39;&#39;
         Simulates making changes to current thermostat settings in the UI via
-        the SubmitControlScreenChanges/ endpoint.\
+        the SubmitControlScreenChanges/ endpoint.
         &#39;&#39;&#39;
         # None seems to mean no change to this control
         data = {
@@ -534,9 +530,14 @@ class PyHTCC:
         logger.debug(f&#34;Posting data to SubmitControlScreenChange: {data}&#34;)
         result = self.session.post(&#39;https://mytotalconnectcomfort.com/portal/Device/SubmitControlScreenChanges&#39;, json=data)
 
-        json_data = result.json()
+        try:
+            json_data = result.json()
+        except Exception:
+            logger.exception(f&#34;Unable to decode json data returned by SubmitControlScreenChanges. Data was:\n {result.text}&#34;)
+            raise
+
         if json_data[&#39;success&#39;] != 1:
-            raise ValueError(f&#34;Success was not returned (success==1): {json_data}&#34;)
+            raise ValueError(f&#34;Success was not returned (success!=1): {json_data}&#34;)
 
 if __name__ == &#39;__main__&#39;:
     email = os.environ.get(&#39;PYHTCC_EMAIL&#39;)
@@ -692,9 +693,6 @@ if __name__ == &#39;__main__&#39;:
         self.password = password
         self._locationId = None
 
-        # cache the device_id -&gt; name mapping since it won&#39;t change
-        self._device_id_to_name = {}
-
         # self.session will be created in authenticate()
         self.authenticate()
 
@@ -710,7 +708,7 @@ if __name__ == &#39;__main__&#39;:
             logger.debug(f&#34;Starting authentication attempt #{i + 1}&#34;)
             try:
                 return self._do_authenticate()
-            except (TooManyAttemptsError, RedirectDidNotHappenError, LoginUnexpectedError) as ex:
+            except (TooManyAttemptsError, RedirectDidNotHappenError, LoginUnexpectedError):
                 logger.exception(&#34;Unable to authenticate at this moment&#34;)
                 num_seconds = 2 ** i
                 logger.debug(f&#34;Sleeping for {num_seconds} seconds&#34;)
@@ -765,22 +763,20 @@ if __name__ == &#39;__main__&#39;:
 
         logger.debug(f&#34;location id is {self._locationId}&#34;)
 
+    @functools.lru_cache(maxsize=None)
     def _get_name_for_device_id(self, device_id:int) -&gt; str:
         &#39;&#39;&#39;
         Will ask via the api for the name corresponding with the device id.
         Note that this actually greps the html for the name.
         Note that this will only perform an HTTP request if we don&#39;t already have this device_id&#39;s name cached
         &#39;&#39;&#39;
+        # grab the name from the portal
+        result = self.session.get(f&#39;https://mytotalconnectcomfort.com/portal/Device/Control/{device_id}?page=1&#39;)
+        result.raise_for_status()
 
-        if device_id not in self._device_id_to_name:
-            # grab the name from the portal
-            result = self.session.get(f&#39;https://mytotalconnectcomfort.com/portal/Device/Control/{device_id}?page=1&#39;)
-            self._device_id_to_name[device_id] = re.findall(r&#39;id=\s?&#34;ZoneName&#34;\s?&gt;(.*) Control&lt;&#39;, result.text)[0]
-            logger.debug(f&#34;Called portal to say {device_id} -&gt; {self._device_id_to_name[device_id]}&#34;)
-        else:
-            logger.debug(f&#34;Used cache to say {device_id} -&gt; {self._device_id_to_name[device_id]}&#34;)
-
-        return self._device_id_to_name[device_id]
+        name = re.findall(r&#39;id=\s?&#34;ZoneName&#34;\s?&gt;(.*) Control&lt;&#39;, result.text)[0]
+        logger.debug(f&#34;Called portal to say {device_id} -&gt; {name}&#34;)
+        return name
 
     def _get_outdoor_weather_info_for_zone(self, device_id:int) -&gt; dict:
         &#39;&#39;&#39;
@@ -832,7 +828,7 @@ if __name__ == &#39;__main__&#39;:
 
             try:
                 data = result.json()
-            except Exception as ex:
+            except Exception:
                 # we can get a 200 with non-json data if pages aren&#39;t needed. Though the 1st page shouldn&#39;t give non-json.
                 if page_num == 1:
                     logger.exception(f&#34;Unable to decode json data returned by GetZoneList. Data was:\n {result.text}&#34;)
@@ -858,8 +854,8 @@ if __name__ == &#39;__main__&#39;:
 
             try:
                 more_data = result.json()
-            except Exception as ex:
-                logger.exception(&#34;Unable to decode json data returned by CheckDataSession. Data was:\n {result.text}&#34;)
+            except Exception:
+                logger.exception(f&#34;Unable to decode json data returned by CheckDataSession. Data was:\n {result.text}&#34;)
                 raise
 
             zones[idx] = {**zone, **more_data, **self._get_outdoor_weather_info_for_zone(device_id)}
@@ -887,7 +883,7 @@ if __name__ == &#39;__main__&#39;:
     def submit_raw_control_changes(self, device_id:int, other_data:dict) -&gt; None:
         &#39;&#39;&#39;
         Simulates making changes to current thermostat settings in the UI via
-        the SubmitControlScreenChanges/ endpoint.\
+        the SubmitControlScreenChanges/ endpoint.
         &#39;&#39;&#39;
         # None seems to mean no change to this control
         data = {
@@ -911,9 +907,14 @@ if __name__ == &#39;__main__&#39;:
         logger.debug(f&#34;Posting data to SubmitControlScreenChange: {data}&#34;)
         result = self.session.post(&#39;https://mytotalconnectcomfort.com/portal/Device/SubmitControlScreenChanges&#39;, json=data)
 
-        json_data = result.json()
+        try:
+            json_data = result.json()
+        except Exception:
+            logger.exception(f&#34;Unable to decode json data returned by SubmitControlScreenChanges. Data was:\n {result.text}&#34;)
+            raise
+
         if json_data[&#39;success&#39;] != 1:
-            raise ValueError(f&#34;Success was not returned (success==1): {json_data}&#34;)</code></pre>
+            raise ValueError(f&#34;Success was not returned (success!=1): {json_data}&#34;)</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>
@@ -941,7 +942,7 @@ sleep intervals if rate-limiting is preventing sign-on.</p></div>
         logger.debug(f&#34;Starting authentication attempt #{i + 1}&#34;)
         try:
             return self._do_authenticate()
-        except (TooManyAttemptsError, RedirectDidNotHappenError, LoginUnexpectedError) as ex:
+        except (TooManyAttemptsError, RedirectDidNotHappenError, LoginUnexpectedError):
             logger.exception(&#34;Unable to authenticate at this moment&#34;)
             num_seconds = 2 ** i
             logger.debug(f&#34;Sleeping for {num_seconds} seconds&#34;)
@@ -1008,7 +1009,7 @@ sleep intervals if rate-limiting is preventing sign-on.</p></div>
 
         try:
             data = result.json()
-        except Exception as ex:
+        except Exception:
             # we can get a 200 with non-json data if pages aren&#39;t needed. Though the 1st page shouldn&#39;t give non-json.
             if page_num == 1:
                 logger.exception(f&#34;Unable to decode json data returned by GetZoneList. Data was:\n {result.text}&#34;)
@@ -1034,8 +1035,8 @@ sleep intervals if rate-limiting is preventing sign-on.</p></div>
 
         try:
             more_data = result.json()
-        except Exception as ex:
-            logger.exception(&#34;Unable to decode json data returned by CheckDataSession. Data was:\n {result.text}&#34;)
+        except Exception:
+            logger.exception(f&#34;Unable to decode json data returned by CheckDataSession. Data was:\n {result.text}&#34;)
             raise
 
         zones[idx] = {**zone, **more_data, **self._get_outdoor_weather_info_for_zone(device_id)}
@@ -1056,7 +1057,7 @@ the SubmitControlScreenChanges/ endpoint.</p></div>
 <pre><code class="python">def submit_raw_control_changes(self, device_id:int, other_data:dict) -&gt; None:
     &#39;&#39;&#39;
     Simulates making changes to current thermostat settings in the UI via
-    the SubmitControlScreenChanges/ endpoint.\
+    the SubmitControlScreenChanges/ endpoint.
     &#39;&#39;&#39;
     # None seems to mean no change to this control
     data = {
@@ -1080,9 +1081,14 @@ the SubmitControlScreenChanges/ endpoint.</p></div>
     logger.debug(f&#34;Posting data to SubmitControlScreenChange: {data}&#34;)
     result = self.session.post(&#39;https://mytotalconnectcomfort.com/portal/Device/SubmitControlScreenChanges&#39;, json=data)
 
-    json_data = result.json()
+    try:
+        json_data = result.json()
+    except Exception:
+        logger.exception(f&#34;Unable to decode json data returned by SubmitControlScreenChanges. Data was:\n {result.text}&#34;)
+        raise
+
     if json_data[&#39;success&#39;] != 1:
-        raise ValueError(f&#34;Success was not returned (success==1): {json_data}&#34;)</code></pre>
+        raise ValueError(f&#34;Success was not returned (success!=1): {json_data}&#34;)</code></pre>
 </details>
 </dd>
 </dl>
