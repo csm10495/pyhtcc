@@ -6,7 +6,8 @@ import getpass
 import os
 import pprint
 
-from .pyhtcc import PyHTCC, Zone, enableConsoleLogging
+from csmlog import enableConsoleLogging
+from .pyhtcc import PyHTCC
 
 def main():
     parser = argparse.ArgumentParser('pyhtcc', description='A CLI to perform actions on a Honeywell Total Comfort Connect thermostat system')

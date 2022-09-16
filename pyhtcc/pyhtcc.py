@@ -3,6 +3,7 @@
 Holds implementation guts for PyHTCC
 '''
 import enum
+import functools
 import os
 import re
 import time
@@ -10,7 +11,7 @@ import typing
 
 import requests  # depends
 # logging setup
-from csmlog import enableConsoleLogging, getLogger, setup  # depends
+from csmlog import getLogger, setup  # depends
 
 setup('pyhtcc')
 logger = getLogger(__file__)
@@ -287,9 +288,6 @@ class PyHTCC:
         self.password = password
         self._locationId = None
 
-        # cache the device_id -> name mapping since it won't change
-        self._device_id_to_name = {}
-
         # self.session will be created in authenticate()
         self.authenticate()
 
@@ -305,7 +303,7 @@ class PyHTCC:
             logger.debug(f"Starting authentication attempt #{i + 1}")
             try:
                 return self._do_authenticate()
-            except (TooManyAttemptsError, RedirectDidNotHappenError, LoginUnexpectedError) as ex:
+            except (TooManyAttemptsError, RedirectDidNotHappenError, LoginUnexpectedError):
                 logger.exception("Unable to authenticate at this moment")
                 num_seconds = 2 ** i
                 logger.debug(f"Sleeping for {num_seconds} seconds")
@@ -360,22 +358,20 @@ class PyHTCC:
 
         logger.debug(f"location id is {self._locationId}")
 
+    @functools.lru_cache(maxsize=None)
     def _get_name_for_device_id(self, device_id:int) -> str:
         '''
         Will ask via the api for the name corresponding with the device id.
         Note that this actually greps the html for the name.
         Note that this will only perform an HTTP request if we don't already have this device_id's name cached
         '''
+        # grab the name from the portal
+        result = self.session.get(f'https://mytotalconnectcomfort.com/portal/Device/Control/{device_id}?page=1')
+        result.raise_for_status()
 
-        if device_id not in self._device_id_to_name:
-            # grab the name from the portal
-            result = self.session.get(f'https://mytotalconnectcomfort.com/portal/Device/Control/{device_id}?page=1')
-            self._device_id_to_name[device_id] = re.findall(r'id=\s?"ZoneName"\s?>(.*) Control<', result.text)[0]
-            logger.debug(f"Called portal to say {device_id} -> {self._device_id_to_name[device_id]}")
-        else:
-            logger.debug(f"Used cache to say {device_id} -> {self._device_id_to_name[device_id]}")
-
-        return self._device_id_to_name[device_id]
+        name = re.findall(r'id=\s?"ZoneName"\s?>(.*) Control<', result.text)[0]
+        logger.debug(f"Called portal to say {device_id} -> {name}")
+        return name
 
     def _get_outdoor_weather_info_for_zone(self, device_id:int) -> dict:
         '''
@@ -427,7 +423,7 @@ class PyHTCC:
 
             try:
                 data = result.json()
-            except Exception as ex:
+            except Exception:
                 # we can get a 200 with non-json data if pages aren't needed. Though the 1st page shouldn't give non-json.
                 if page_num == 1:
                     logger.exception(f"Unable to decode json data returned by GetZoneList. Data was:\n {result.text}")
@@ -453,8 +449,8 @@ class PyHTCC:
 
             try:
                 more_data = result.json()
-            except Exception as ex:
-                logger.exception("Unable to decode json data returned by CheckDataSession. Data was:\n {result.text}")
+            except Exception:
+                logger.exception(f"Unable to decode json data returned by CheckDataSession. Data was:\n {result.text}")
                 raise
 
             zones[idx] = {**zone, **more_data, **self._get_outdoor_weather_info_for_zone(device_id)}
@@ -482,7 +478,7 @@ class PyHTCC:
     def submit_raw_control_changes(self, device_id:int, other_data:dict) -> None:
         '''
         Simulates making changes to current thermostat settings in the UI via
-        the SubmitControlScreenChanges/ endpoint.\
+        the SubmitControlScreenChanges/ endpoint.
         '''
         # None seems to mean no change to this control
         data = {
@@ -506,9 +502,14 @@ class PyHTCC:
         logger.debug(f"Posting data to SubmitControlScreenChange: {data}")
         result = self.session.post('https://mytotalconnectcomfort.com/portal/Device/SubmitControlScreenChanges', json=data)
 
-        json_data = result.json()
+        try:
+            json_data = result.json()
+        except Exception:
+            logger.exception(f"Unable to decode json data returned by SubmitControlScreenChanges. Data was:\n {result.text}")
+            raise
+
         if json_data['success'] != 1:
-            raise ValueError(f"Success was not returned (success==1): {json_data}")
+            raise ValueError(f"Success was not returned (success!=1): {json_data}")
 
 if __name__ == '__main__':
     email = os.environ.get('PYHTCC_EMAIL')
