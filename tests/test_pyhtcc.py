@@ -67,10 +67,12 @@ class TestPyHTCC:
         self.mock_session.get.return_value = self.next_requests_result
 
     def mock_zone_name_cache(self):
-        self.pyhtcc._device_id_to_name = {
-            123456 : 'A',
-            1234567 : 'B'
-        }
+        def mocked(device_id: int):
+            return {
+                123456 : 'A',
+                1234567 : 'B'
+            }[device_id]
+        self.pyhtcc._get_name_for_device_id = mocked
 
     def mock_outdoor_weather(self, temp, humidity):
         self.pyhtcc._get_outdoor_weather_info_for_zone = lambda *args, **kwargs: {
