@@ -71,7 +71,7 @@ jobs:
       - name: Run PyInstaller
         run: |
           pip install pyinstaller===5.6.2
-          pyinstaller --onefile -n pyhtcc pyhtcc/__main__.py
+          pyinstaller --onefile -n pyhtcc.exe pyhtcc/__main__.py
           dir dist/
 
       - name: Perform release
