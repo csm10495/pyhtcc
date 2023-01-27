@@ -1,6 +1,6 @@
 name: Run tests and release
 
-on: push
+on: [ create, push ]
 
 jobs:
   test:
