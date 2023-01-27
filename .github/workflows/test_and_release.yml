@@ -78,13 +78,15 @@ jobs:
         with:
           generate_release_notes: true
           files: dist/pyhtcc.exe
-          tag_name: ${{ steps.version-bump.outputs.tag }}"
+          tag_name: ${{ steps.version-bump.outputs.tag }}
 
       - name: Upload to PyPi
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+        shell: bash
         run: |
+          rm -rf dist
           pip install setuptools wheel twine
           python setup.py sdist bdist_wheel
           twine upload dist/*
