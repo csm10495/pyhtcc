@@ -72,12 +72,13 @@ jobs:
         run: |
           pip install pyinstaller===5.6.2
           pyinstaller --onefile -n pyhtcc pyhtcc/__main__.py
+          dir dist/
 
       - name: Perform release
         uses: softprops/action-gh-release@v1
         with:
           generate_release_notes: true
-          files: dist/pyhtcc.exe
+          files: dist/*.exe
           tag_name: ${{ steps.version-bump.outputs.tag }}
 
       - name: Upload to PyPi
