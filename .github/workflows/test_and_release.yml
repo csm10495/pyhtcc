@@ -33,6 +33,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Generate and push docs
+        shell: bash
         run: |
           python3 -m pip install .
           python3 generate_docs.py
@@ -40,11 +41,11 @@ jobs:
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"
 
-          git add docs/* || VER>NUL
-          git add README.md || VER>NUL
-          git commit -a -m "Updating docs" || VER>NUL
+          git add docs/* || true
+          git add README.md || true
+          git commit -a -m "Updating docs" || true
           git pull --rebase
-          git push origin master || VER>NUL
+          git push origin master || true
 
       - name: Generate help_output.txt
         run: |
