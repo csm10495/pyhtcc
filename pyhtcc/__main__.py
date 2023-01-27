@@ -8,7 +8,7 @@ import pprint
 
 from csmlog import enableConsoleLogging
 
-from .pyhtcc import PyHTCC
+from pyhtcc import PyHTCC
 
 
 def main():
