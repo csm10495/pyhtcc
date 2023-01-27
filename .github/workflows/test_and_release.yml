@@ -31,7 +31,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-
       - name: Generate and push docs
         run: |
           python3 -m pip install .
@@ -42,16 +41,13 @@ jobs:
           git commit -a -m "Updating docs" || VER>NUL
           git pull --rebase
           git push origin master || VER>NUL
-
       - name: Generate help_output.txt
       - run: |
           python -m pip install --upgrade pip
           pip install .
           pyhtcc --help > help_output.txt
-
       - name: Markdown autodocs
         uses: dineshsonachalam/markdown-autodocs@v1.0.7
-
       - name: Perform version bump
         run: |
           python -m pip install bump2version
@@ -60,18 +56,15 @@ jobs:
           bump2version patch
           git push
           git push --tags
-
       - name: Run PyInstaller
         run: |
           pip install pyinstaller===5.6.2
           pyinstaller --onefile -n pyhtcc pyhtcc/__main__.py
-
       - name: Perform release
         uses: softprops/action-gh-release@v1
         with:
           generate_release_notes: true
           files: dist/pyhtcc.exe
-
       - name: Upload to PyPi
         env:
           TWINE_USERNAME: __token__
