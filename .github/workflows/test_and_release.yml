@@ -1,0 +1,72 @@
+name: Run tests and release
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: [3.7, 3.8, 3.9, '3.10']
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Update pip
+        run: python -m pip install -U pip
+      - name: Install pytest
+        run: python -m pip install pytest
+      - name: Install pyhtcc/requirements
+        run: python -m pip install .
+      - name: Run pytest
+        run: python -m pytest
+
+  build_release:
+    if: startsWith(github.ref, 'refs/tags/') && github.event_name != 'pull_request'
+    needs: test
+    runs-on: windows-latest
+    steps:
+      - name: Get Code
+        uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - run: pip install pyinstaller===5.6.2
+        working-directory: ${{ github.workspace }}
+      - run: pip install .
+        working-directory: ${{ github.workspace }}
+      - run: pyinstaller --onefile -n pyhtcc pyhtcc/__main__.py
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          generate_release_notes: true
+          files: dist/pyhtcc.exe
+
+  pypi:
+    runs-on: windows-latest
+    needs: build_release
+    steps:
+      - name: Get Code
+        uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install setuptools wheel twine
+      - name: Build and publish
+        working-directory: ${{ github.workspace }}
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+        run: |
+          python setup.py sdist bdist_wheel
+          twine upload dist/*
