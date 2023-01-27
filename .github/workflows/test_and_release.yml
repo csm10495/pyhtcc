@@ -76,6 +76,9 @@ jobs:
       - name: Bump patch version
         run: |
           python -m pip install bump2version
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>"
+
           git pull --rebase
           bump2version patch
           git push
