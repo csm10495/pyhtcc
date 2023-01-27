@@ -24,7 +24,7 @@ jobs:
       - name: Run pytest
         run: python -m pytest
 
-  build_docs:
+  build_and_release:
     needs: test
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
