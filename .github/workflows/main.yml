@@ -34,8 +34,8 @@ jobs:
         git config user.name "GitHub Actions Bot"
         git config user.email "<>"
 
-        git pull --rebase
         git add docs/* || true
         git add README.md || true
         git commit -a -m "Updating docs" || true
+        git pull --rebase
         git push origin master || true
