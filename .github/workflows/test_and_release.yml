@@ -27,7 +27,7 @@ jobs:
   build_and_release:
     needs: test
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
       - uses: actions/checkout@v3
