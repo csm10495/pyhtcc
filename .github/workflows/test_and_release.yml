@@ -37,6 +37,9 @@ jobs:
           python3 -m pip install .
           python3 generate_docs.py
 
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>"
+
           git add docs/* || VER>NUL
           git add README.md || VER>NUL
           git commit -a -m "Updating docs" || VER>NUL
