@@ -30,53 +30,53 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: Generate and push docs
-      run: |
-        python3 -m pip install .
-        python3 generate_docs.py
+      - name: Generate and push docs
+        run: |
+          python3 -m pip install .
+          python3 generate_docs.py
 
-        git add docs/* || VER>NUL
-        git add README.md || VER>NUL
-        git commit -a -m "Updating docs" || VER>NUL
-        git pull --rebase
-        git push origin master || VER>NUL
+          git add docs/* || VER>NUL
+          git add README.md || VER>NUL
+          git commit -a -m "Updating docs" || VER>NUL
+          git pull --rebase
+          git push origin master || VER>NUL
 
-    - name: Generate help_output.txt
-    - run: |
-        python -m pip install --upgrade pip
-        pip install .
-        pyhtcc --help > help_output.txt
+      - name: Generate help_output.txt
+      - run: |
+          python -m pip install --upgrade pip
+          pip install .
+          pyhtcc --help > help_output.txt
 
-    - name: Markdown autodocs
-      uses: dineshsonachalam/markdown-autodocs@v1.0.7
+      - name: Markdown autodocs
+        uses: dineshsonachalam/markdown-autodocs@v1.0.7
 
-    - name: Perform version bump
-      run: |
-        python -m pip install bump2version
+      - name: Perform version bump
+        run: |
+          python -m pip install bump2version
 
-        git pull --rebase
-        bump2version patch
-        git push
-        git push --tags
+          git pull --rebase
+          bump2version patch
+          git push
+          git push --tags
 
-    - name: Run PyInstaller
-      run: |
-        pip install pyinstaller===5.6.2
-        pyinstaller --onefile -n pyhtcc pyhtcc/__main__.py
+      - name: Run PyInstaller
+        run: |
+          pip install pyinstaller===5.6.2
+          pyinstaller --onefile -n pyhtcc pyhtcc/__main__.py
 
-    - name: Perform release
-      uses: softprops/action-gh-release@v1
-      with:
-        generate_release_notes: true
-        files: dist/pyhtcc.exe
+      - name: Perform release
+        uses: softprops/action-gh-release@v1
+        with:
+          generate_release_notes: true
+          files: dist/pyhtcc.exe
 
-    - name: Upload to PyPi
-      env:
-        TWINE_USERNAME: __token__
-        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-      run: |
-        pip install setuptools wheel twine
-        python setup.py sdist bdist_wheel
-        twine upload dist/*
+      - name: Upload to PyPi
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+        run: |
+          pip install setuptools wheel twine
+          python setup.py sdist bdist_wheel
+          twine upload dist/*
