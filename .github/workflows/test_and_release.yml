@@ -27,104 +27,56 @@ jobs:
   build_docs:
     needs: test
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
-    # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v3
 
-    # Runs a single command using the runners shell
-    - name: Generate docs
+    - name: Generate and push docs
       run: |
-        cd $GITHUB_WORKSPACE
-        ls
-        python3 --version
-        sudo apt-get install python3-setuptools -y
         python3 -m pip install .
-
         python3 generate_docs.py
 
-        git config user.name "GitHub Actions Bot"
-        git config user.email "<>"
-
-        git add docs/* || true
-        git add README.md || true
-        git commit -a -m "Updating docs" || true
+        git add docs/* || VER>NUL
+        git add README.md || VER>NUL
+        git commit -a -m "Updating docs" || VER>NUL
         git pull --rebase
-        git push origin master || true
+        git push origin master || VER>NUL
 
-  update_readme_and_bump_version:
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Get Code
-        uses: actions/checkout@v3
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install .
-          pyhtcc --help > help_output.txt
-      - name: Markdown autodocs
-        uses: dineshsonachalam/markdown-autodocs@v1.0.7
-      - name: Bump patch version
-        run: |
-          python -m pip install bump2version
-          git config user.name "GitHub Actions Bot"
-          git config user.email "<>"
+    - name: Generate help_output.txt
+    - run: |
+        python -m pip install --upgrade pip
+        pip install .
+        pyhtcc --help > help_output.txt
 
-          git pull --rebase
-          bump2version patch
-          git push
-          git push --tags
+    - name: Markdown autodocs
+      uses: dineshsonachalam/markdown-autodocs@v1.0.7
 
-  build_release:
-    if: startsWith(github.ref, 'refs/tags/') && github.event_name != 'pull_request'
-    needs: test
-    runs-on: windows-latest
-    steps:
-      - name: Get Code
-        uses: actions/checkout@v3
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-      - run: pip install pyinstaller===5.6.2
-        working-directory: ${{ github.workspace }}
-      - run: pip install .
-        working-directory: ${{ github.workspace }}
-      - run: pyinstaller --onefile -n pyhtcc pyhtcc/__main__.py
-      - name: Release
-        uses: softprops/action-gh-release@v1
-        with:
-          generate_release_notes: true
-          files: dist/pyhtcc.exe
+    - name: Perform version bump
+      run: |
+        python -m pip install bump2version
 
-  pypi:
-    runs-on: windows-latest
-    needs: build_release
-    steps:
-      - name: Get Code
-        uses: actions/checkout@v3
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install setuptools wheel twine
-      - name: Build and publish
-        working-directory: ${{ github.workspace }}
-        env:
-          TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-        run: |
-          python setup.py sdist bdist_wheel
-          twine upload dist/*
+        git pull --rebase
+        bump2version patch
+        git push
+        git push --tags
+
+    - name: Run PyInstaller
+      run: |
+        pip install pyinstaller===5.6.2
+        pyinstaller --onefile -n pyhtcc pyhtcc/__main__.py
+
+    - name: Perform release
+      uses: softprops/action-gh-release@v1
+      with:
+        generate_release_notes: true
+        files: dist/pyhtcc.exe
+
+    - name: Upload to PyPi
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      run: |
+        pip install setuptools wheel twine
+        python setup.py sdist bdist_wheel
+        twine upload dist/*
