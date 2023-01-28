@@ -58,6 +58,7 @@ jobs:
       - uses: actions/setup-node@v3
 
       - name: Markdown autodocs
+        shell: bash
         run: |
           npm install -g markdown-autodocs
           markdown-autodocs -c code-block -o README.md
