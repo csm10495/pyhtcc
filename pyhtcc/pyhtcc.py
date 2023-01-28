@@ -1,6 +1,7 @@
 """
 Holds implementation guts for PyHTCC
 """
+import datetime
 import enum
 import functools
 import os
@@ -288,6 +289,105 @@ class Zone:
                 "StatusHeat": 2,
                 "StatusCool": 2,
                 "SystemSwitch": 1,
+            }
+        )
+
+    def _coerce_temp_end_to_setpoint(
+        self, end: typing.Union[datetime.timedelta, datetime.time, None] = None
+    ) -> typing.Union[None, int]:
+        """
+        Takes the given end and converts it into a 'NextPeriod' for use by submit_control_changes.
+        This field is a 15 minute-based field.. so 0 = midnight, 1 = 12:15am, 2 = 12:30am, etc.
+
+        a datetime.time translates directly while a datetime.timedelta will be a 'delta from now'.
+        """
+        ret = None
+        if isinstance(end, datetime.time):
+            ret = int((end.hour * 4) + round(end.minute / 15))
+        elif isinstance(end, datetime.timedelta):
+            if end.days > 0:
+                raise ValueError("The timedelta must be less than a day")
+
+            the_end = datetime.datetime.now() + end
+            the_end_time = the_end.time()
+            ret = self._coerce_temp_end_to_setpoint(the_end_time)
+        elif isinstance(end, type(None)):
+            pass
+        else:
+            raise ValueError(
+                f"end must be either a datetime.time or datetime.timedelta, not a {type(end)}"
+            )
+
+        return ret
+
+    def set_temp_heat_setpoint(
+        self,
+        temp: int,
+        end: typing.Union[datetime.timedelta, datetime.time, None] = None,
+    ) -> None:
+        """
+        Sets a new temporary heat setpoint.
+        This will also attempt to turn the thermostat to 'Heat'
+
+        If you provide an 'end' it should be either:
+            - A datetime.timedelta for less than 24 hours from now
+            OR
+            - A datetime.time for a specific time of day (within the next 24 hours)
+            OR
+            - None corresponding with 'the thermostat will pick an end time'
+
+        The end will automatically be rounded to the nearest 15 minute mark.
+        """
+        logger.info(f"setting temp heat on with a target temp of: {temp}")
+        return self.submit_control_changes(
+            {
+                "HeatSetpoint": temp,
+                "StatusHeat": 1,
+                "StatusCool": 1,
+                "SystemSwitch": 1,
+                "HeatNextPeriod": self._coerce_temp_end_to_setpoint(end),
+            }
+        )
+
+    def set_temp_cool_setpoint(
+        self,
+        temp: int,
+        end: typing.Union[datetime.timedelta, datetime.time, None] = None,
+    ) -> None:
+        """
+        Sets a new temporary cool setpoint.
+        This will also attempt to turn the thermostat to 'Cool'
+
+        If you provide an 'end' it should be either:
+            - A datetime.timedelta for less than 24 hours from now
+            OR
+            - A datetime.time for a specific time of day (within the next 24 hours)
+            OR
+            - None corresponding with 'the thermostat will pick an end time'
+
+        The end will automatically be rounded to the nearest 15 minute mark.
+        """
+        logger.info(f"setting temp heat on with a target temp of: {temp}")
+        return self.submit_control_changes(
+            {
+                "CoolSetpoint": temp,
+                "StatusHeat": 1,
+                "StatusCool": 1,
+                "SystemSwitch": 3,
+                "CoolNextPeriod": self._coerce_temp_end_to_setpoint(end),
+            }
+        )
+
+    def end_hold(self) -> None:
+        """
+        Requests that the zone end its current hold.
+        Normally this tells the thermostat to resume its schedule.
+        """
+        logger.info("ending hold")
+        return self.submit_control_changes(
+            {
+                "StatusHeat": 0,
+                "StatusCool": 0,
             }
         )
 

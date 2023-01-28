@@ -1,11 +1,11 @@
 """
 includes all tests for PyHTCC
 """
+import datetime
 import json
 import pathlib
 import sys
 import unittest.mock
-import warnings
 
 import pytest
 
@@ -372,3 +372,108 @@ class TestPyHTCC:
             assert zone.set_permananent_heat_setpoint(2) == "heat"
 
         zone.set_permanent_heat_setpoint.assert_called_once_with(2)
+
+    def test_coerce_temp_end_to_setpoint(self):
+        self.mock_zone_name_cache()
+
+        zone = self.pyhtcc.get_zone_by_name("A")
+
+        # check datetime.time work
+        assert zone._coerce_temp_end_to_setpoint(datetime.time(0, 0)) == 0
+        assert zone._coerce_temp_end_to_setpoint(datetime.time(0, 1)) == 0
+        assert zone._coerce_temp_end_to_setpoint(datetime.time(0, 15)) == 1
+        assert zone._coerce_temp_end_to_setpoint(datetime.time(0, 16)) == 1
+        assert zone._coerce_temp_end_to_setpoint(datetime.time(1, 0)) == 4
+        assert zone._coerce_temp_end_to_setpoint(datetime.time(1, 16)) == 5
+        assert zone._coerce_temp_end_to_setpoint(datetime.time(1, 41)) == 7
+        assert zone._coerce_temp_end_to_setpoint(datetime.time(23, 59)) == 96
+
+        # check datetime.timedelta work
+        with pytest.raises(ValueError):
+            zone._coerce_temp_end_to_setpoint(datetime.timedelta(days=1))
+
+        fake_now = datetime.datetime(2020, month=1, day=1, hour=1, minute=0)
+        fake_dt = unittest.mock.Mock()
+        fake_dt.now = unittest.mock.Mock(return_value=fake_now)
+        with unittest.mock.patch("pyhtcc.pyhtcc.datetime.datetime", fake_dt):
+            assert (
+                zone._coerce_temp_end_to_setpoint(
+                    datetime.timedelta(hours=23, minutes=59)
+                )
+                == 4
+            )
+            assert (
+                zone._coerce_temp_end_to_setpoint(
+                    datetime.timedelta(hours=1, minutes=0)
+                )
+                == 8
+            )
+            assert (
+                zone._coerce_temp_end_to_setpoint(
+                    datetime.timedelta(hours=0, minutes=15)
+                )
+                == 5
+            )
+            assert (
+                zone._coerce_temp_end_to_setpoint(
+                    datetime.timedelta(hours=13, minutes=15)
+                )
+                == 57
+            )
+
+        # check None works
+        assert zone._coerce_temp_end_to_setpoint(None) is None
+
+        # check other raises
+        with pytest.raises(ValueError):
+            zone._coerce_temp_end_to_setpoint("lol")
+
+    def test_end_hold(self):
+        self.mock_zone_name_cache()
+
+        zone = self.pyhtcc.get_zone_by_name("A")
+        zone.submit_control_changes = unittest.mock.Mock(return_value=8)
+        assert zone.end_hold() == 8
+
+        zone.submit_control_changes.assert_called_once_with(
+            {
+                "StatusHeat": 0,
+                "StatusCool": 0,
+            }
+        )
+
+    def test_set_temp_heat_setpoint(self):
+        self.mock_zone_name_cache()
+
+        zone = self.pyhtcc.get_zone_by_name("A")
+        zone.submit_control_changes = unittest.mock.Mock(return_value=8)
+        zone._coerce_temp_end_to_setpoint = unittest.mock.Mock(return_value="next")
+        assert zone.set_temp_heat_setpoint(99, "nothing")
+
+        zone.submit_control_changes.assert_called_once_with(
+            {
+                "HeatSetpoint": 99,
+                "StatusHeat": 1,
+                "StatusCool": 1,
+                "SystemSwitch": 1,
+                "HeatNextPeriod": "next",
+            }
+        )
+
+    def test_set_temp_cool_setpoint(self):
+        self.mock_zone_name_cache()
+
+        zone = self.pyhtcc.get_zone_by_name("A")
+        zone.submit_control_changes = unittest.mock.Mock(return_value=8)
+        zone._coerce_temp_end_to_setpoint = unittest.mock.Mock(return_value="next")
+        assert zone.set_temp_cool_setpoint(99, "nothing")
+
+        zone.submit_control_changes.assert_called_once_with(
+            {
+                "CoolSetpoint": 99,
+                "StatusHeat": 1,
+                "StatusCool": 1,
+                "SystemSwitch": 3,
+                "CoolNextPeriod": "next",
+            }
+        )
