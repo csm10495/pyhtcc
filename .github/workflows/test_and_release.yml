@@ -40,8 +40,8 @@ jobs:
       - name: Generate and push docs
         shell: bash
         run: |
-          python3 -m pip install .
-          python3 generate_docs.py
+          python -m pip install .
+          python generate_docs.py
 
           git add docs/* || true
           git add README.md || true
@@ -49,32 +49,26 @@ jobs:
           git pull --rebase
           git push origin master || true
 
-      - name: Generate help_output.txt
-        run: |
-          python -m pip install --upgrade pip
-          pip install .
-          pyhtcc --help > help_output.txt
-
       - uses: actions/setup-node@v3
 
       - name: Markdown autodocs
         shell: bash
         run: |
+          pyhtcc --help > help_output.txt
           npm install -g markdown-autodocs
           markdown-autodocs -c code-block -o README.md
           git commit README.md -m "Updating readme" || true
           git push origin master || true
+          git clean -dfx
 
       - name: Perform version bump
         id: version-bump
         shell: bash
         run: |
-          python -m pip install bump2version
+          pip install bump2version
 
-          git pull --rebase
           bump2version patch
-          git push
-          git push --tags
+          git push --follow-tags
 
           echo "tag=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
 
