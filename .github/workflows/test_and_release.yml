@@ -57,7 +57,8 @@ jobs:
           pyhtcc --help > help_output.txt
           npm install -g markdown-autodocs
           markdown-autodocs -c code-block -o README.md
-          git commit README.md -m "Updating readme" || true
+          git add README.md || true
+          git commit -m "Updating readme" || true
           git push origin master || true
           git clean -dfx
 
