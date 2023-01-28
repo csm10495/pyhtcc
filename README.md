@@ -31,7 +31,7 @@ usage: pyhtcc [-h] [-u USER] [-p PASSWORD] [-n NAME] [-s] [-d]
 A CLI to perform actions on a Honeywell Total Comfort Connect thermostat
 system
 
-options:
+optional arguments:
   -h, --help            show this help message and exit
   -u USER, --user USER  Username to login to TCC. If not given uses the
                         environment variable PYHTCC_EMAIL
