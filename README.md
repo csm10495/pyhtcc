@@ -1,4 +1,4 @@
-![Run tests](https://github.com/csm10495/pyhtcc/workflows/Run%20tests/badge.svg) [![PyPI version](https://badge.fury.io/py/pyhtcc.svg)](https://badge.fury.io/py/pyhtcc)
+[![Run tests and release](https://github.com/csm10495/pyhtcc/actions/workflows/test_and_release.yml/badge.svg)](https://github.com/csm10495/pyhtcc/actions/workflows/test_and_release.yml) ![PyPI Version](https://img.shields.io/pypi/v/pyhtcc?color=green)
 
 # PyHTCC
 
