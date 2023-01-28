@@ -60,8 +60,9 @@ jobs:
         with:
           args: install wget -y
 
+      - uses: actions/setup-node@v3
+
       - name: Markdown autodocs
-        uses: actions/setup-node@v3
         run: |
           npm install -g markdown-autodocs
           markdown-autodocs -c code-block -o README.md
