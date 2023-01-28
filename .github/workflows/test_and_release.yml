@@ -55,11 +55,6 @@ jobs:
           pip install .
           pyhtcc --help > help_output.txt
 
-      - name: Install wget (for markdown-autodocs)
-        uses: crazy-max/ghaction-chocolatey@v2
-        with:
-          args: install wget -y
-
       - uses: actions/setup-node@v3
 
       - name: Markdown autodocs
