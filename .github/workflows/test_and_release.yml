@@ -32,14 +32,16 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Configure git for pushing
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>"
+
       - name: Generate and push docs
         shell: bash
         run: |
           python3 -m pip install .
           python3 generate_docs.py
-
-          git config user.name "GitHub Actions Bot"
-          git config user.email "<>"
 
           git add docs/* || true
           git add README.md || true
@@ -59,7 +61,12 @@ jobs:
           args: install wget -y
 
       - name: Markdown autodocs
-        uses: dineshsonachalam/markdown-autodocs@v1.0.7
+        uses: actions/setup-node@v3
+        run: |
+          npm install -g markdown-autodocs
+          markdown-autodocs -c code-block -o README.md
+          git commit README.md -m "Updating readme" || true
+          git push origin master || true
 
       - name: Perform version bump
         id: version-bump
