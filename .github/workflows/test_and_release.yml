@@ -10,7 +10,7 @@ jobs:
       # by default, operating-systems points to ubuntu/mac/windows
   pdoc3:
     needs: test
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+    if: github.event_name != 'pull_request' # && github.ref == 'refs/heads/master'
     uses: csm10495/actions/.github/workflows/pdoc3.yml@master
     with:
       python-version: '3.11'
