@@ -9,6 +9,8 @@ jobs:
       python-versions: '["3.7", "3.8", "3.9", "3.10", "3.11"]'
       # by default, operating-systems points to ubuntu/mac/windows
   pdoc3:
+    needs: test
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
     uses: csm10495/actions/.github/workflows/pdoc3.yml@master
     with:
       python-version: '3.11'
