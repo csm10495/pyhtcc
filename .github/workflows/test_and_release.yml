@@ -6,5 +6,5 @@ jobs:
   test:
     uses: csm10495/actions/.github/workflows/pytest.yml@master
     with:
-      python-versions: "['3.7', '3.8', '3.9', '3.10', '3.11']"
+      python-versions: '["3.7", "3.8", "3.9", "3.10", "3.11"]'
       # by default, operating-systems points to ubuntu/mac/windows
