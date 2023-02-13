@@ -24,3 +24,4 @@ jobs:
       operating-system: 'ubuntu-latest'
       cmd-to-run: 'pyhtcc --help > help_output.txt'
       file-to-update: README.md
+      git-ref: ${{ needs.pdoc3.outputs.git-ref }}
