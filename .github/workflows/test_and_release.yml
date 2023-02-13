@@ -24,10 +24,7 @@ jobs:
       operating-system: 'ubuntu-latest'
       cmd-to-run: 'pyhtcc --help > help_output.txt'
       file-to-update: README.md
-      git-ref: ${{ needs.pdoc3.outputs.git-ref }}
   version-bump:
     needs: markdown-autodocs
     if: github.event_name != 'pull_request' # && github.ref == 'refs/heads/master'
     uses: csm10495/actions/.github/workflows/version-bump.yml@master
-    with:
-      git-ref: ${{ needs.markdown-autodocs.outputs.git-ref }}
