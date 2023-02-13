@@ -15,3 +15,12 @@ jobs:
     with:
       python-version: '3.11'
       operating-system: 'ubuntu-latest'
+  markdown-autodocs:
+    needs: pdoc3
+    if: github.event_name != 'pull_request' # && github.ref == 'refs/heads/master'
+    uses: csm10495/actions/.github/workflows/markdown-autodocs.yml@master
+    with:
+      python-version: '3.11'
+      operating-system: 'ubuntu-latest'
+      cmd-to-run: 'pyhtcc --help > help_output.txt'
+      file-to-update: README.md
