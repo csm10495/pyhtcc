@@ -24,10 +24,10 @@ jobs:
       operating-system: 'ubuntu-latest'
       cmd-to-run: 'pyhtcc --help > help_output.txt'
       file-to-update: README.md
-  #version-bump:
-  #  needs: markdown-autodocs
-  #  if: github.event_name != 'pull_request' # && github.ref == 'refs/heads/master'
-  #  uses: csm10495/actions/.github/workflows/version-bump.yml@master
+  version-bump:
+    needs: markdown-autodocs
+    if: github.event_name != 'pull_request' # && github.ref == 'refs/heads/master'
+    uses: csm10495/actions/.github/workflows/version-bump.yml@master
   pyinstaller:
     needs: markdown-autodocs
     if: github.event_name != 'pull_request' # && github.ref == 'refs/heads/master'
