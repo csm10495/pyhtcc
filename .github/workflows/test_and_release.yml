@@ -45,3 +45,5 @@ jobs:
     needs: pyinstaller
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
     uses: csm10495/actions/.github/workflows/pypi-upload.yml@master
+    with:
+      python-version: '3.11'
