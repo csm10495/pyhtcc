@@ -47,3 +47,4 @@ jobs:
     uses: csm10495/actions/.github/workflows/pypi-upload.yml@master
     with:
       python-version: '3.11'
+    secrets: inherit
