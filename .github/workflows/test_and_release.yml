@@ -38,6 +38,6 @@ jobs:
       executable-name: pyhtcc.exe
       entrypoint-file: pyhtcc/__main__.py
   github-release:
-    needs: github-release
+    needs: pyinstaller
     if: github.event_name != 'pull_request' # && github.ref == 'refs/heads/master'
     uses: csm10495/actions/.github/workflows/github-release.yml@master
