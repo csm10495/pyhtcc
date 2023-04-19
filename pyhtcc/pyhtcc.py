@@ -4,6 +4,7 @@ Holds implementation guts for PyHTCC
 import datetime
 import enum
 import functools
+import json
 import os
 import re
 import time
@@ -31,8 +32,20 @@ class LoginCredentialsInvalidError(ValueError):
     pass
 
 
-class LoginUnexpectedError(EnvironmentError):
-    """raised if we logged in, but the site says that there was an unexpected error"""
+class UnauthorizedError(ValueError):
+    """denoted if we are logged in, but received something akin to a 401 error"""
+
+    pass
+
+
+class UnexpectedError(EnvironmentError):
+    """raised if a non json response denotes an unexpected error"""
+
+    pass
+
+
+class LoginUnexpectedError(UnexpectedError):
+    """raised if we logged in, but the site says that there was an unexpected error via redirect"""
 
     pass
 
@@ -51,6 +64,12 @@ class RedirectDidNotHappenError(EnvironmentError):
 
 class ZoneNotFoundError(EnvironmentError):
     """raised if the zone could not be found on refresh"""
+
+    pass
+
+
+class NoZonesFoundError(EnvironmentError):
+    """Raised if there appear to be no zones in our current location"""
 
     pass
 
@@ -487,6 +506,7 @@ class PyHTCC:
                 "Password": self.password,
             },
         )
+
         if result.status_code != 200:
             raise AuthenticationError(
                 f"Unable to authenticate as {self.username}. Status was: {result.status_code}"
@@ -587,25 +607,71 @@ class PyHTCC:
             "OutdoorHumidity": outdoor_humidity,
         }
 
-    def _post_zone_list_data(self, page_num: int) -> requests.Response:
+    def _post_zone_list_data(self, page_num: int) -> typing.Optional[dict]:
         """
-        Private function to call a specific TCC API
+        Private function to call the GetZoneListData api. On success returns the json data.
+
+        Internally this function will catch UnexpectedError as that is expected when we read beyond the last page.
+
         See tests for sample output.
         """
-        return self.session.post(
-            f"https://mytotalconnectcomfort.com/portal/Device/GetZoneListData?locationId={self._locationId}&page={page_num}",
-            headers={"X-Requested-With": "XMLHttpRequest"},
+        try:
+            return self._request_json(
+                "POST",
+                f"https://mytotalconnectcomfort.com/portal/Device/GetZoneListData?locationId={self._locationId}&page={page_num}",
+            )
+        except UnexpectedError:
+            return None
+
+    def _get_check_data_session(self, device_id: int) -> dict:
+        """
+        Private function to call the CheckDataSession api. On success returns the json data.
+
+        See tests for sample output.
+        """
+        return self._request_json(
+            "GET",
+            f"https://mytotalconnectcomfort.com/portal/Device/CheckDataSession/{device_id}",
         )
 
-    def _get_check_data_session(self, device_id: int) -> requests.Response:
+    def _request_json(
+        self, method: str, url: str, data: typing.Optional[dict] = None
+    ) -> dict:
         """
-        Private function to call a specific TCC API
-        See tests for sample output.
+        Private function to make a request and return the json data.
+
+        Will attempt to sanity check the response and raise appropriate exceptions if something appears wrong.
         """
-        return self.session.get(
-            f"https://mytotalconnectcomfort.com/portal/Device/CheckDataSession/{device_id}",
-            headers={"X-Requested-With": "XMLHttpRequest"},
+        result = self.session.request(
+            method,
+            url,
+            json=data,
+            headers={
+                "accept": "application/json",
+                "X-Requested-With": "XMLHttpRequest",
+            },
         )
+
+        try:
+            result_json = result.json()
+        except json.JSONDecodeError:
+            result_json = None
+
+        if result.status_code != 200 or result_json is None:
+            logger.error(
+                f"Got unexpected response from {url}: {result.status_code}. Data was:\n {result.text}"
+            )
+
+            if (
+                "Unauthorized: Access is denied due to invalid credentials"
+                in result.text
+                or result.status_code == 401
+            ):
+                raise UnauthorizedError("Got unauthorized response from server")
+
+            raise UnexpectedError("Expected json data in the response")
+
+        return result_json
 
     def get_zones_info(self) -> list:
         """
@@ -616,19 +682,13 @@ class PyHTCC:
             logger.debug(
                 f"Attempting to get zones for location id, page: {self._locationId}, {page_num}"
             )
-            result = self._post_zone_list_data(page_num)
-
-            try:
-                data = result.json()
-            except Exception:
-                # we can get a 200 with non-json data if pages aren't needed. Though the 1st page shouldn't give non-json.
-                if page_num == 1:
-                    logger.exception(
-                        f"Unable to decode json data returned by GetZoneList. Data was:\n {result.text}"
-                    )
-                    raise
-                else:
-                    data = {}
+            data = self._post_zone_list_data(page_num)
+            if page_num == 1 and not data:
+                raise NoZonesFoundError("No zones were found from GetZoneListData")
+            elif not data:
+                # first empty page means we're done
+                logger.debug(f"page {page_num} is empty")
+                break
 
             # once we go to an empty page, we're done. Luckily it returns empty json instead of erroring
             if not data:
@@ -644,15 +704,7 @@ class PyHTCC:
             zone["Name"] = name
 
             device_id = zone["DeviceID"]
-            result = self._get_check_data_session(device_id)
-
-            try:
-                more_data = result.json()
-            except Exception:
-                logger.exception(
-                    f"Unable to decode json data returned by CheckDataSession. Data was:\n {result.text}"
-                )
-                raise
+            more_data = self._get_check_data_session(device_id)
 
             zones[idx] = {
                 **zone,
@@ -707,18 +759,12 @@ class PyHTCC:
             data[k] = v
 
         logger.debug(f"Posting data to SubmitControlScreenChange: {data}")
-        result = self.session.post(
-            "https://mytotalconnectcomfort.com/portal/Device/SubmitControlScreenChanges",
-            json=data,
-        )
 
-        try:
-            json_data = result.json()
-        except Exception:
-            logger.exception(
-                f"Unable to decode json data returned by SubmitControlScreenChanges. Data was:\n {result.text}"
-            )
-            raise
+        json_data = self._request_json(
+            "POST",
+            "https://mytotalconnectcomfort.com/portal/Device/SubmitControlScreenChanges",
+            data=data,
+        )
 
         if json_data["success"] != 1:
             raise ValueError(f"Success was not returned (success!=1): {json_data}")

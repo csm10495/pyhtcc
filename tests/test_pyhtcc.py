@@ -15,10 +15,13 @@ from pyhtcc import (
     FanMode,
     LoginCredentialsInvalidError,
     LoginUnexpectedError,
+    NoZonesFoundError,
     PyHTCC,
     RedirectDidNotHappenError,
     SystemMode,
     TooManyAttemptsError,
+    UnauthorizedError,
+    UnexpectedError,
     Zone,
     ZoneNotFoundError,
 )
@@ -41,6 +44,10 @@ class FakeResult:
         self.url = url
 
     def json(self):
+        if not isinstance(self._json_data, dict):
+            raise json.JSONDecodeError("json_data is not a dict", "", 0)
+
+        # but then we return the actual data
         return self._json_data
 
 
@@ -62,13 +69,13 @@ class TestPyHTCC:
 
             def _handle_post_zone_list_data(page_num: int):
                 if page_num == 1:
-                    return FakeResult(SAMPLE_POST_ZONE_DATA)
+                    return SAMPLE_POST_ZONE_DATA
                 else:
                     # empty data if page != 1
-                    return FakeResult([])
+                    return None
 
             def _handle_get_check_data_session(device_id: int):
-                return FakeResult(SAMPLE_GET_DATA_SESSION)
+                return SAMPLE_GET_DATA_SESSION
 
             # patch methods with mock data
             self.pyhtcc._post_zone_list_data = _handle_post_zone_list_data
@@ -78,10 +85,12 @@ class TestPyHTCC:
     def mock_post_result(self, result):
         self.next_requests_result = result
         self.mock_session.post.return_value = self.next_requests_result
+        self.mock_session.request.return_value = self.next_requests_result
 
     def mock_get_result(self, result):
         self.next_requests_result = result
         self.mock_session.get.return_value = self.next_requests_result
+        self.mock_session.request.return_value = self.next_requests_result
 
     def mock_zone_name_cache(self):
         def mocked(device_id: int):
@@ -105,15 +114,16 @@ class TestPyHTCC:
     def test_submitting_raw_control_changes_will_raise_valueerror_on_success_not_being_1(
         self,
     ):
-        result = unittest.mock.Mock()
-        result.json = lambda: {"success": 0}
+        result = FakeResult({"success": 0})
 
         self.mock_post_result(result)
         with pytest.raises(ValueError):
             self.pyhtcc.submit_raw_control_changes(0, {})
 
     def test_submitting_raw_control_changes_passes_value(self):
-        with unittest.mock.patch.object(self.pyhtcc.session, "post") as mock_post:
+        with unittest.mock.patch.object(
+            self.pyhtcc, "_request_json"
+        ) as mock_request_json:
             with pytest.raises(ValueError):
                 self.pyhtcc.submit_raw_control_changes(
                     1999,
@@ -124,8 +134,8 @@ class TestPyHTCC:
                 )
 
             # check kwargs of post
-            assert mock_post.call_args[1]["json"]["CoolNextPeriod"] == 23
-            assert mock_post.call_args[1]["json"]["SystemSwitch"] == 5
+            assert mock_request_json.call_args[1]["data"]["CoolNextPeriod"] == 23
+            assert mock_request_json.call_args[1]["data"]["SystemSwitch"] == 5
 
     def test_getting_outdoor_weather_for_zone(self):
         result = unittest.mock.Mock()
@@ -271,6 +281,13 @@ class TestPyHTCC:
             assert zone["latestData"]["drData"]["CoolSetpLimit"] is None
             assert zone["OutdoorTemperature"] == 19
             assert zone["OutdoorHumidity"] == 56
+
+    def test_get_zones_info_no_zones(self):
+        self.pyhtcc._post_zone_list_data = unittest.mock.Mock(return_value={})
+        with pytest.raises(NoZonesFoundError):
+            self.pyhtcc.get_zones_info()
+
+        self.pyhtcc._post_zone_list_data.assert_called_once_with(1)
 
     def test_get_zone_by_name_and_others(self):
         self.mock_zone_name_cache()
@@ -477,3 +494,41 @@ class TestPyHTCC:
                 "CoolNextPeriod": "next",
             }
         )
+
+    def test_request_json_good(self):
+        self.pyhtcc.session.request = unittest.mock.Mock(
+            return_value=FakeResult(dict(result="good"))
+        )
+        assert self.pyhtcc._request_json("GET2", "url", "data") == dict(result="good")
+        self.pyhtcc.session.request.assert_called_once_with(
+            "GET2",
+            "url",
+            json="data",
+            headers={
+                "accept": "application/json",
+                "X-Requested-With": "XMLHttpRequest",
+            },
+        )
+
+    def test_request_json_not_json(self):
+        self.pyhtcc.session.request = unittest.mock.Mock(
+            return_value=FakeResult("not json")
+        )
+        with pytest.raises(UnexpectedError):
+            assert self.pyhtcc._request_json("GET2", "url", "data")
+
+    def test_request_json_not_200(self):
+        self.pyhtcc.session.request = unittest.mock.Mock(
+            return_value=FakeResult(dict(result="good"), 500)
+        )
+        with pytest.raises(UnexpectedError):
+            assert self.pyhtcc._request_json("GET2", "url", "data")
+
+    def test_request_json_unauthorized(self):
+        self.pyhtcc.session.request = unittest.mock.Mock(
+            return_value=FakeResult(
+                "Unauthorized: Access is denied due to invalid credentials"
+            )
+        )
+        with pytest.raises(UnauthorizedError):
+            assert self.pyhtcc._request_json("GET2", "url", "data")
