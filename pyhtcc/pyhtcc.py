@@ -541,9 +541,11 @@ class PyHTCC:
         """
         Attempts to find the location id first from the url then if that fails, in the result's text content
         """
-        try:
-            self._locationId = int(result.url.split("portal/")[1].split("/")[0])
-        except ValueError:
+        # Match any /<number>/ OR /<number> at the end of the url
+        matches = re.findall(r"/(\d+)(?:\/|$)", result.url)
+        if matches:
+            self._locationId = int(matches[0])
+        else:
             logger.debug(
                 "Unable to grab location id via url... checking content instead"
             )
