@@ -8,15 +8,9 @@ jobs:
     with:
       python-versions: '["3.7", "3.8", "3.9", "3.10", "3.11"]'
       # by default, operating-systems points to ubuntu/mac/windows
-  pdoc3:
-    needs: test
-    if: github.event_name != 'pull_request'
-    uses: csm10495/actions/.github/workflows/pdoc3.yml@master
-    with:
-      python-version: '3.11'
-      operating-system: 'ubuntu-latest'
+
   markdown-autodocs:
-    needs: pdoc3
+    needs: test
     if: github.event_name != 'pull_request'
     uses: csm10495/actions/.github/workflows/markdown-autodocs.yml@master
     with:
@@ -24,12 +18,22 @@ jobs:
       operating-system: 'ubuntu-latest'
       cmd-to-run: 'pyhtcc --help > help_output.txt'
       file-to-update: README.md
+
   version-bump:
     needs: markdown-autodocs
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
     uses: csm10495/actions/.github/workflows/version-bump.yml@master
-  pyinstaller:
+
+  pdoc3:
     needs: version-bump
+    if: github.event_name != 'pull_request'
+    uses: csm10495/actions/.github/workflows/pdoc3.yml@master
+    with:
+      python-version: '3.11'
+      operating-system: 'ubuntu-latest'
+
+  pyinstaller:
+    needs: pdoc3
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
     uses: csm10495/actions/.github/workflows/pyinstaller.yml@master
     with:
@@ -37,14 +41,16 @@ jobs:
       operating-system: 'windows-latest'
       executable-name: pyhtcc.exe
       entrypoint-file: pyhtcc/__main__.py
-  github-release:
-    needs: pyinstaller
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
-    uses: csm10495/actions/.github/workflows/github-release.yml@master
+
   pypi-upload:
-    needs: pyinstaller
+    needs: pdoc3
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
     uses: csm10495/actions/.github/workflows/pypi-upload.yml@master
     with:
       python-version: '3.11'
     secrets: inherit
+
+  github-release:
+    needs: pyinstaller
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+    uses: csm10495/actions/.github/workflows/github-release.yml@master
