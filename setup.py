@@ -38,6 +38,8 @@ setup(
         "Programming Language :: Python :: 3",
     ],
     include_package_data=True,
-    install_requires=["csmlog", "requests", "deprecated"],
+    # requests 2.27.0 changed the exception raised when .json() fails.
+    # See https://github.com/psf/requests/pull/5856
+    install_requires=["csmlog", "requests>=2.27", "deprecated"],
     entry_points={"console_scripts": ["pyhtcc = pyhtcc.__main__:main"]},
 )
