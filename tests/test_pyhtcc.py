@@ -8,6 +8,7 @@ import sys
 import unittest.mock
 
 import pytest
+import requests
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 from pyhtcc import (
@@ -45,7 +46,7 @@ class FakeResult:
 
     def json(self):
         if not isinstance(self._json_data, dict):
-            raise json.JSONDecodeError("json_data is not a dict", "", 0)
+            raise requests.exceptions.JSONDecodeError("json_data is not a dict", "", 0)
 
         # but then we return the actual data
         return self._json_data

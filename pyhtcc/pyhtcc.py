@@ -4,7 +4,6 @@ Holds implementation guts for PyHTCC
 import datetime
 import enum
 import functools
-import json
 import os
 import re
 import time
@@ -656,7 +655,7 @@ class PyHTCC:
 
         try:
             result_json = result.json()
-        except json.JSONDecodeError:
+        except requests.exceptions.JSONDecodeError:
             result_json = None
 
         if result.status_code != 200 or result_json is None:
