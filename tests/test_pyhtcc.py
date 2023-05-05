@@ -358,15 +358,9 @@ class TestPyHTCC:
         assert zone.get_fan_mode() == FanMode.Auto
         assert zone.is_fan_running() is True
 
-    def test_setting_location_id_via_url_1(self):
+    def test_setting_location_id_via_url(self):
         result = unittest.mock.MagicMock()
         result.url = "https://www.mytotalconnectcomfort.com/portal/90210/Zones"
-        self.pyhtcc._set_location_id_from_result(result)
-        assert self.pyhtcc._locationId == 90210
-
-    def test_setting_location_id_via_url_2(self):
-        result = unittest.mock.MagicMock()
-        result.url = "https://mytotalconnectcomfort.com/portal/Device/Control/90210"
         self.pyhtcc._set_location_id_from_result(result)
         assert self.pyhtcc._locationId == 90210
 
