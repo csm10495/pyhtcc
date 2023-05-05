@@ -569,11 +569,9 @@ class PyHTCC:
         &#34;&#34;&#34;
         Attempts to find the location id first from the url then if that fails, in the result&#39;s text content
         &#34;&#34;&#34;
-        # Match any /&lt;number&gt;/ OR /&lt;number&gt; at the end of the url
-        matches = re.findall(r&#34;/(\d+)(?:\/|$)&#34;, result.url)
-        if matches:
-            self._locationId = int(matches[0])
-        else:
+        try:
+            self._locationId = int(result.url.split(&#34;portal/&#34;)[1].split(&#34;/&#34;)[0])
+        except ValueError:
             logger.debug(
                 &#34;Unable to grab location id via url... checking content instead&#34;
             )
@@ -1064,11 +1062,9 @@ if __name__ == &#34;__main__&#34;:
         &#34;&#34;&#34;
         Attempts to find the location id first from the url then if that fails, in the result&#39;s text content
         &#34;&#34;&#34;
-        # Match any /&lt;number&gt;/ OR /&lt;number&gt; at the end of the url
-        matches = re.findall(r&#34;/(\d+)(?:\/|$)&#34;, result.url)
-        if matches:
-            self._locationId = int(matches[0])
-        else:
+        try:
+            self._locationId = int(result.url.split(&#34;portal/&#34;)[1].split(&#34;/&#34;)[0])
+        except ValueError:
             logger.debug(
                 &#34;Unable to grab location id via url... checking content instead&#34;
             )
