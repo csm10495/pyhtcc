@@ -547,7 +547,7 @@ class PyHTCC:
         if(self.session != None):
             logger.debug(f"Attempting deauthentication for {self.username}")
 
-            result = self.session.post(
+            result = self.session.get(
                  "https://mytotalconnectcomfort.com/portal/Account/LogOff"
              )
 
