@@ -53,6 +53,10 @@ class AuthenticationError(ValueError):
 
     pass
 
+class DeAuthenticationError(ValueError):
+    &#34;&#34;&#34;denoted if we are completely unable to dauthenticate&#34;&#34;&#34;
+
+    pass
 
 class LoginCredentialsInvalidError(ValueError):
     &#34;&#34;&#34;denoted if it appears as though invalid login credentials were given&#34;&#34;&#34;
@@ -565,6 +569,25 @@ class PyHTCC:
 
         self._set_location_id_from_result(result)
 
+    def deAuthenticate(self) -&gt; None:
+        &#34;&#34;&#34;
+        Attempts to deauthenticate with mytotalconnectcomfort.com.
+        &#34;&#34;&#34;
+        if(self.session != None):
+            logger.debug(f&#34;Attempting deauthentication for {self.username}&#34;)
+
+            result = self.session.get(
+                 &#34;https://mytotalconnectcomfort.com/portal/Account/LogOff&#34;
+             )
+
+            if result.status_code != 200:
+                raise DeAuthenticationError(
+                    f&#34;Unable to  deauthenticate as {self.username}. Status was: {result.status_code}&#34;
+                )
+            else:
+                logger.debug(f&#34;Logged out of TCC server for {self.username}&#34;)
+
+
     def _set_location_id_from_result(self, result):
         &#34;&#34;&#34;
         Attempts to find the location id first from the url then if that fails, in the result&#39;s text content
@@ -838,6 +861,28 @@ if __name__ == &#34;__main__&#34;:
 <li>builtins.BaseException</li>
 </ul>
 </dd>
+<dt id="pyhtcc.pyhtcc.DeAuthenticationError"><code class="flex name class">
+<span>class <span class="ident">DeAuthenticationError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>denoted if we are completely unable to dauthenticate</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class DeAuthenticationError(ValueError):
+    &#34;&#34;&#34;denoted if we are completely unable to dauthenticate&#34;&#34;&#34;
+
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.ValueError</li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
 <dt id="pyhtcc.pyhtcc.FanMode"><code class="flex name class">
 <span>class <span class="ident">FanMode</span></span>
 <span>(</span><span>*args, **kwds)</span>
@@ -1057,6 +1102,25 @@ if __name__ == &#34;__main__&#34;:
             raise LoginUnexpectedError(f&#34;{result.url} denotes an error&#34;)
 
         self._set_location_id_from_result(result)
+
+    def deAuthenticate(self) -&gt; None:
+        &#34;&#34;&#34;
+        Attempts to deauthenticate with mytotalconnectcomfort.com.
+        &#34;&#34;&#34;
+        if(self.session != None):
+            logger.debug(f&#34;Attempting deauthentication for {self.username}&#34;)
+
+            result = self.session.get(
+                 &#34;https://mytotalconnectcomfort.com/portal/Account/LogOff&#34;
+             )
+
+            if result.status_code != 200:
+                raise DeAuthenticationError(
+                    f&#34;Unable to  deauthenticate as {self.username}. Status was: {result.status_code}&#34;
+                )
+            else:
+                logger.debug(f&#34;Logged out of TCC server for {self.username}&#34;)
+
 
     def _set_location_id_from_result(self, result):
         &#34;&#34;&#34;
@@ -1327,6 +1391,34 @@ sleep intervals if rate-limiting is preventing sign-on.</p></div>
             time.sleep(num_seconds)
 
     raise AuthenticationError(&#34;Unable to authenticate. Ran out of tries&#34;)</code></pre>
+</details>
+</dd>
+<dt id="pyhtcc.pyhtcc.PyHTCC.deAuthenticate"><code class="name flex">
+<span>def <span class="ident">deAuthenticate</span></span>(<span>self) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Attempts to deauthenticate with mytotalconnectcomfort.com.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def deAuthenticate(self) -&gt; None:
+    &#34;&#34;&#34;
+    Attempts to deauthenticate with mytotalconnectcomfort.com.
+    &#34;&#34;&#34;
+    if(self.session != None):
+        logger.debug(f&#34;Attempting deauthentication for {self.username}&#34;)
+
+        result = self.session.get(
+             &#34;https://mytotalconnectcomfort.com/portal/Account/LogOff&#34;
+         )
+
+        if result.status_code != 200:
+            raise DeAuthenticationError(
+                f&#34;Unable to  deauthenticate as {self.username}. Status was: {result.status_code}&#34;
+            )
+        else:
+            logger.debug(f&#34;Logged out of TCC server for {self.username}&#34;)</code></pre>
 </details>
 </dd>
 <dt id="pyhtcc.pyhtcc.PyHTCC.get_all_zones"><code class="name flex">
@@ -2656,6 +2748,9 @@ More likely than not, most users need not use this call directly.</p></div>
 <h4><code><a title="pyhtcc.pyhtcc.AuthenticationError" href="#pyhtcc.pyhtcc.AuthenticationError">AuthenticationError</a></code></h4>
 </li>
 <li>
+<h4><code><a title="pyhtcc.pyhtcc.DeAuthenticationError" href="#pyhtcc.pyhtcc.DeAuthenticationError">DeAuthenticationError</a></code></h4>
+</li>
+<li>
 <h4><code><a title="pyhtcc.pyhtcc.FanMode" href="#pyhtcc.pyhtcc.FanMode">FanMode</a></code></h4>
 <ul class="">
 <li><code><a title="pyhtcc.pyhtcc.FanMode.Auto" href="#pyhtcc.pyhtcc.FanMode.Auto">Auto</a></code></li>
@@ -2678,6 +2773,7 @@ More likely than not, most users need not use this call directly.</p></div>
 <h4><code><a title="pyhtcc.pyhtcc.PyHTCC" href="#pyhtcc.pyhtcc.PyHTCC">PyHTCC</a></code></h4>
 <ul class="">
 <li><code><a title="pyhtcc.pyhtcc.PyHTCC.authenticate" href="#pyhtcc.pyhtcc.PyHTCC.authenticate">authenticate</a></code></li>
+<li><code><a title="pyhtcc.pyhtcc.PyHTCC.deAuthenticate" href="#pyhtcc.pyhtcc.PyHTCC.deAuthenticate">deAuthenticate</a></code></li>
 <li><code><a title="pyhtcc.pyhtcc.PyHTCC.get_all_zones" href="#pyhtcc.pyhtcc.PyHTCC.get_all_zones">get_all_zones</a></code></li>
 <li><code><a title="pyhtcc.pyhtcc.PyHTCC.get_zone_by_name" href="#pyhtcc.pyhtcc.PyHTCC.get_zone_by_name">get_zone_by_name</a></code></li>
 <li><code><a title="pyhtcc.pyhtcc.PyHTCC.get_zones_info" href="#pyhtcc.pyhtcc.PyHTCC.get_zones_info">get_zones_info</a></code></li>
