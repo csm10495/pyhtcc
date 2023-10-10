@@ -25,7 +25,7 @@ See [https://csm10495.github.io/pyhtcc/](https://csm10495.github.io/pyhtcc/) for
 <!-- MARKDOWN-AUTO-DOCS:START (CODE:src=./help_output.txt) -->
 <!-- The below code snippet is automatically added from ./help_output.txt -->
 ```txt
-usage: pyhtcc [-h] [-u USER] [-p PASSWORD] [-n NAME] [-s] [-d]
+usage: pyhtcc [-h] [-u USER] [-p PASSWORD] [-n NAME] [-s] [-d] [-l]
               [-H HEAT | -C COOL]
 
 A CLI to perform actions on a Honeywell Total Comfort Connect thermostat
@@ -43,6 +43,8 @@ options:
                         zones
   -s, --show-info       If given, will show info and quit.
   -d, --debug           If given, will log to stdout
+  -l, --logout          if given, will logout from TCC service using portal
+                        logout URL
   -H HEAT, --heat HEAT  Set a target heat temperature
   -C COOL, --cool COOL  Set a target cooling temperature
 ```
