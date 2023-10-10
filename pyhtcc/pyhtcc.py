@@ -24,6 +24,10 @@ class AuthenticationError(ValueError):
 
     pass
 
+class DeAuthenticationError(ValueError):
+    """denoted if we are completely unable to dauthenticate"""
+
+    pass
 
 class LoginCredentialsInvalidError(ValueError):
     """denoted if it appears as though invalid login credentials were given"""
@@ -535,6 +539,25 @@ class PyHTCC:
             raise LoginUnexpectedError(f"{result.url} denotes an error")
 
         self._set_location_id_from_result(result)
+
+    def deAuthenticate(self) -> None:
+        """
+        Attempts to deauthenticate with mytotalconnectcomfort.com.
+        """
+        if(self.session != None):
+            logger.debug(f"Attempting deauthentication for {self.username}")
+
+            result = self.session.post(
+                 "https://mytotalconnectcomfort.com/portal/Account/LogOff"
+             )
+
+            if result.status_code != 200:
+                raise DeAuthenticationError(
+                    f"Unable to  deauthenticate as {self.username}. Status was: {result.status_code}"
+                )
+            else:
+                logger.debug(f"Logged out of TCC server for {self.username}")
+
 
     def _set_location_id_from_result(self, result):
         """
