@@ -11,7 +11,7 @@ jobs:
 
   markdown-autodocs:
     needs: test
-    if: github.event_name != 'pull_request'
+    if:  ${{ github.event_name != 'pull_request' }}
     uses: csm10495/actions/.github/workflows/markdown-autodocs.yml@master
     with:
       python-version: '3.11'
@@ -21,12 +21,12 @@ jobs:
 
   version-bump:
     needs: markdown-autodocs
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+    if: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/master' }}
     uses: csm10495/actions/.github/workflows/version-bump.yml@master
 
   pdoc3:
     needs: version-bump
-    if: github.event_name != 'pull_request'
+    if: ${{ github.event_name != 'pull_request' }}
     uses: csm10495/actions/.github/workflows/pdoc3.yml@master
     with:
       python-version: '3.11'
@@ -34,7 +34,7 @@ jobs:
 
   pyinstaller:
     needs: pdoc3
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+    if: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/master' }}
     uses: csm10495/actions/.github/workflows/pyinstaller.yml@master
     with:
       python-version: '3.11'
@@ -44,7 +44,7 @@ jobs:
 
   pypi-upload:
     needs: pdoc3
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+    if: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/master' }}
     uses: csm10495/actions/.github/workflows/pypi-upload.yml@master
     with:
       python-version: '3.11'
@@ -52,5 +52,5 @@ jobs:
 
   github-release:
     needs: pyinstaller
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+    if: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/master' }}
     uses: csm10495/actions/.github/workflows/github-release.yml@master
