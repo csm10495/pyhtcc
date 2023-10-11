@@ -1,6 +1,8 @@
 """
 Holds implementation guts for PyHTCC
 """
+from __future__ import annotations
+
 import datetime
 import enum
 import functools
@@ -33,6 +35,18 @@ class LoginCredentialsInvalidError(ValueError):
 
 class UnauthorizedError(ValueError):
     """denoted if we are logged in, but received something akin to a 401 error"""
+
+    pass
+
+
+class LogoutFailureError(ValueError):
+    """denoted if we are unable to logout"""
+
+    pass
+
+
+class NoSessionError(ValueError):
+    """denotes if we have no logged in session"""
 
     pass
 
@@ -458,6 +472,7 @@ class PyHTCC:
         self.username = username
         self.password = password
         self._locationId = None
+        self.session = None
 
         # self.session will be created in authenticate()
         self.authenticate()
@@ -485,6 +500,21 @@ class PyHTCC:
                 time.sleep(num_seconds)
 
         raise AuthenticationError("Unable to authenticate. Ran out of tries")
+
+    def _ensure_session(func) -> None:
+        """
+        Will raise if we do not have a session to work with
+        """
+
+        @functools.wraps(func)
+        def decorator(self, *args, **kwargs):
+            if self.session is None:
+                raise NoSessionError(
+                    "Session is unavailable. Did you logout and forget to call authenticate() again?"
+                )
+            return func(self, *args, **kwargs)
+
+        return decorator
 
     def _do_authenticate(self) -> None:
         """
@@ -536,6 +566,25 @@ class PyHTCC:
 
         self._set_location_id_from_result(result)
 
+    @_ensure_session
+    def logout(self) -> None:
+        """
+        Attempts to logout from mytotalconnectcomfort.com.
+
+        Note that after calling this function, you must call authenticate() to login and get a new session.
+        """
+        logger.debug(f"Attempting to logout user: {self.username}")
+        result = self.session.get(
+            "https://mytotalconnectcomfort.com/portal/Account/LogOff"
+        )
+        if not result.ok:
+            raise LogoutFailureError(
+                f"Unable to logout user: {self.username}, status={result.status_code}"
+            )
+
+        logger.debug(f"Successfully logged out: {self.username}")
+        self.session = None
+
     def _set_location_id_from_result(self, result):
         """
         Attempts to find the location id first from the url then if that fails, in the result's text content
@@ -551,6 +600,7 @@ class PyHTCC:
         logger.debug(f"location id is {self._locationId}")
 
     @functools.lru_cache(maxsize=None)
+    @_ensure_session
     def _get_name_for_device_id(self, device_id: int) -> str:
         """
         Will ask via the api for the name corresponding with the device id.
@@ -567,6 +617,7 @@ class PyHTCC:
         logger.debug(f"Called portal to say {device_id} -> {name}")
         return name
 
+    @_ensure_session
     def _get_outdoor_weather_info_for_zone(self, device_id: int) -> dict:
         """
         Private API to find the outdoor information on one of the logged in pages
@@ -633,6 +684,7 @@ class PyHTCC:
             f"https://mytotalconnectcomfort.com/portal/Device/CheckDataSession/{device_id}",
         )
 
+    @_ensure_session
     def _request_json(
         self, method: str, url: str, data: typing.Optional[dict] = None
     ) -> dict:

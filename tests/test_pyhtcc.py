@@ -16,6 +16,8 @@ from pyhtcc import (
     FanMode,
     LoginCredentialsInvalidError,
     LoginUnexpectedError,
+    LogoutFailureError,
+    NoSessionError,
     NoZonesFoundError,
     PyHTCC,
     RedirectDidNotHappenError,
@@ -533,3 +535,38 @@ class TestPyHTCC:
         )
         with pytest.raises(UnauthorizedError):
             assert self.pyhtcc._request_json("GET2", "url", "data")
+
+    def test_logout_and_session(self):
+        # save ref
+        session = self.pyhtcc.session
+
+        self.pyhtcc.logout()
+        assert self.pyhtcc.session is None
+
+        session.get.assert_called_once_with(
+            "https://mytotalconnectcomfort.com/portal/Account/LogOff"
+        )
+
+        with pytest.raises(NoSessionError):
+            self.pyhtcc.logout()
+
+        with pytest.raises(NoSessionError):
+            self.pyhtcc._get_name_for_device_id(12345)
+
+        with pytest.raises(NoSessionError):
+            self.pyhtcc._get_outdoor_weather_info_for_zone(12345)
+
+        with pytest.raises(NoSessionError):
+            self.pyhtcc._request_json("GET", "url")
+
+    def test_logout_failure_error(self):
+        result = unittest.mock.MagicMock()
+        result.ok = False
+        result.status_code = 500
+
+        self.pyhtcc.session.get.return_value = result
+
+        with pytest.raises(LogoutFailureError) as err:
+            self.pyhtcc.logout()
+
+        assert str(err.value) == "Unable to logout user: user, status=500"

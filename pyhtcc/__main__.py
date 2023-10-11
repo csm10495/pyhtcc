@@ -43,6 +43,12 @@ def main():
     parser.add_argument(
         "-d", "--debug", action="store_true", help="If given, will log to stdout"
     )
+    parser.add_argument(
+        "-l",
+        "--logout",
+        action="store_true",
+        help="if given, will logout from TCC after performing actions.",
+    )
 
     heat_cool_action_group = parser.add_mutually_exclusive_group(required=False)
     heat_cool_action_group.add_argument(
@@ -92,6 +98,9 @@ def main():
             if args.cool:
                 print(f"Setting setpoint for {i.get_name()} to {args.cool}")
                 i.set_permanent_cool_setpoint(args.cool)
+
+    if args.logout:
+        pyhtcc.logout()
 
 
 if __name__ == "__main__":
