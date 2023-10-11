@@ -30,6 +30,8 @@
 <pre><code class="python">&#34;&#34;&#34;
 Holds implementation guts for PyHTCC
 &#34;&#34;&#34;
+from __future__ import annotations
+
 import datetime
 import enum
 import functools
@@ -62,6 +64,18 @@ class LoginCredentialsInvalidError(ValueError):
 
 class UnauthorizedError(ValueError):
     &#34;&#34;&#34;denoted if we are logged in, but received something akin to a 401 error&#34;&#34;&#34;
+
+    pass
+
+
+class LogoutFailureError(ValueError):
+    &#34;&#34;&#34;denoted if we are unable to logout&#34;&#34;&#34;
+
+    pass
+
+
+class NoSessionError(ValueError):
+    &#34;&#34;&#34;denotes if we have no logged in session&#34;&#34;&#34;
 
     pass
 
@@ -487,6 +501,7 @@ class PyHTCC:
         self.username = username
         self.password = password
         self._locationId = None
+        self.session = None
 
         # self.session will be created in authenticate()
         self.authenticate()
@@ -514,6 +529,21 @@ class PyHTCC:
                 time.sleep(num_seconds)
 
         raise AuthenticationError(&#34;Unable to authenticate. Ran out of tries&#34;)
+
+    def _ensure_session(func) -&gt; None:
+        &#34;&#34;&#34;
+        Will raise if we do not have a session to work with
+        &#34;&#34;&#34;
+
+        @functools.wraps(func)
+        def decorator(self, *args, **kwargs):
+            if self.session is None:
+                raise NoSessionError(
+                    &#34;Session is unavailable. Did you logout and forget to call authenticate() again?&#34;
+                )
+            return func(self, *args, **kwargs)
+
+        return decorator
 
     def _do_authenticate(self) -&gt; None:
         &#34;&#34;&#34;
@@ -565,6 +595,25 @@ class PyHTCC:
 
         self._set_location_id_from_result(result)
 
+    @_ensure_session
+    def logout(self) -&gt; None:
+        &#34;&#34;&#34;
+        Attempts to logout from mytotalconnectcomfort.com.
+
+        Note that after calling this function, you must call authenticate() to login and get a new session.
+        &#34;&#34;&#34;
+        logger.debug(f&#34;Attempting to logout user: {self.username}&#34;)
+        result = self.session.get(
+            &#34;https://mytotalconnectcomfort.com/portal/Account/LogOff&#34;
+        )
+        if not result.ok:
+            raise LogoutFailureError(
+                f&#34;Unable to logout user: {self.username}, status={result.status_code}&#34;
+            )
+
+        logger.debug(f&#34;Successfully logged out: {self.username}&#34;)
+        self.session = None
+
     def _set_location_id_from_result(self, result):
         &#34;&#34;&#34;
         Attempts to find the location id first from the url then if that fails, in the result&#39;s text content
@@ -580,6 +629,7 @@ class PyHTCC:
         logger.debug(f&#34;location id is {self._locationId}&#34;)
 
     @functools.lru_cache(maxsize=None)
+    @_ensure_session
     def _get_name_for_device_id(self, device_id: int) -&gt; str:
         &#34;&#34;&#34;
         Will ask via the api for the name corresponding with the device id.
@@ -596,6 +646,7 @@ class PyHTCC:
         logger.debug(f&#34;Called portal to say {device_id} -&gt; {name}&#34;)
         return name
 
+    @_ensure_session
     def _get_outdoor_weather_info_for_zone(self, device_id: int) -&gt; dict:
         &#34;&#34;&#34;
         Private API to find the outdoor information on one of the logged in pages
@@ -662,6 +713,7 @@ class PyHTCC:
             f&#34;https://mytotalconnectcomfort.com/portal/Device/CheckDataSession/{device_id}&#34;,
         )
 
+    @_ensure_session
     def _request_json(
         self, method: str, url: str, data: typing.Optional[dict] = None
     ) -&gt; dict:
@@ -935,6 +987,50 @@ if __name__ == &#34;__main__&#34;:
 <li>builtins.BaseException</li>
 </ul>
 </dd>
+<dt id="pyhtcc.pyhtcc.LogoutFailureError"><code class="flex name class">
+<span>class <span class="ident">LogoutFailureError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>denoted if we are unable to logout</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class LogoutFailureError(ValueError):
+    &#34;&#34;&#34;denoted if we are unable to logout&#34;&#34;&#34;
+
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.ValueError</li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="pyhtcc.pyhtcc.NoSessionError"><code class="flex name class">
+<span>class <span class="ident">NoSessionError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>denotes if we have no logged in session</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class NoSessionError(ValueError):
+    &#34;&#34;&#34;denotes if we have no logged in session&#34;&#34;&#34;
+
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.ValueError</li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
 <dt id="pyhtcc.pyhtcc.NoZonesFoundError"><code class="flex name class">
 <span>class <span class="ident">NoZonesFoundError</span></span>
 <span>(</span><span>*args, **kwargs)</span>
@@ -980,6 +1076,7 @@ if __name__ == &#34;__main__&#34;:
         self.username = username
         self.password = password
         self._locationId = None
+        self.session = None
 
         # self.session will be created in authenticate()
         self.authenticate()
@@ -1007,6 +1104,21 @@ if __name__ == &#34;__main__&#34;:
                 time.sleep(num_seconds)
 
         raise AuthenticationError(&#34;Unable to authenticate. Ran out of tries&#34;)
+
+    def _ensure_session(func) -&gt; None:
+        &#34;&#34;&#34;
+        Will raise if we do not have a session to work with
+        &#34;&#34;&#34;
+
+        @functools.wraps(func)
+        def decorator(self, *args, **kwargs):
+            if self.session is None:
+                raise NoSessionError(
+                    &#34;Session is unavailable. Did you logout and forget to call authenticate() again?&#34;
+                )
+            return func(self, *args, **kwargs)
+
+        return decorator
 
     def _do_authenticate(self) -&gt; None:
         &#34;&#34;&#34;
@@ -1058,6 +1170,25 @@ if __name__ == &#34;__main__&#34;:
 
         self._set_location_id_from_result(result)
 
+    @_ensure_session
+    def logout(self) -&gt; None:
+        &#34;&#34;&#34;
+        Attempts to logout from mytotalconnectcomfort.com.
+
+        Note that after calling this function, you must call authenticate() to login and get a new session.
+        &#34;&#34;&#34;
+        logger.debug(f&#34;Attempting to logout user: {self.username}&#34;)
+        result = self.session.get(
+            &#34;https://mytotalconnectcomfort.com/portal/Account/LogOff&#34;
+        )
+        if not result.ok:
+            raise LogoutFailureError(
+                f&#34;Unable to logout user: {self.username}, status={result.status_code}&#34;
+            )
+
+        logger.debug(f&#34;Successfully logged out: {self.username}&#34;)
+        self.session = None
+
     def _set_location_id_from_result(self, result):
         &#34;&#34;&#34;
         Attempts to find the location id first from the url then if that fails, in the result&#39;s text content
@@ -1073,6 +1204,7 @@ if __name__ == &#34;__main__&#34;:
         logger.debug(f&#34;location id is {self._locationId}&#34;)
 
     @functools.lru_cache(maxsize=None)
+    @_ensure_session
     def _get_name_for_device_id(self, device_id: int) -&gt; str:
         &#34;&#34;&#34;
         Will ask via the api for the name corresponding with the device id.
@@ -1089,6 +1221,7 @@ if __name__ == &#34;__main__&#34;:
         logger.debug(f&#34;Called portal to say {device_id} -&gt; {name}&#34;)
         return name
 
+    @_ensure_session
     def _get_outdoor_weather_info_for_zone(self, device_id: int) -&gt; dict:
         &#34;&#34;&#34;
         Private API to find the outdoor information on one of the logged in pages
@@ -1155,6 +1288,7 @@ if __name__ == &#34;__main__&#34;:
             f&#34;https://mytotalconnectcomfort.com/portal/Device/CheckDataSession/{device_id}&#34;,
         )
 
+    @_ensure_session
     def _request_json(
         self, method: str, url: str, data: typing.Optional[dict] = None
     ) -&gt; dict:
@@ -1418,6 +1552,36 @@ sleep intervals if rate-limiting is preventing sign-on.</p></div>
     return zones</code></pre>
 </details>
 </dd>
+<dt id="pyhtcc.pyhtcc.PyHTCC.logout"><code class="name flex">
+<span>def <span class="ident">logout</span></span>(<span>self) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Attempts to logout from mytotalconnectcomfort.com.</p>
+<p>Note that after calling this function, you must call authenticate() to login and get a new session.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_ensure_session
+def logout(self) -&gt; None:
+    &#34;&#34;&#34;
+    Attempts to logout from mytotalconnectcomfort.com.
+
+    Note that after calling this function, you must call authenticate() to login and get a new session.
+    &#34;&#34;&#34;
+    logger.debug(f&#34;Attempting to logout user: {self.username}&#34;)
+    result = self.session.get(
+        &#34;https://mytotalconnectcomfort.com/portal/Account/LogOff&#34;
+    )
+    if not result.ok:
+        raise LogoutFailureError(
+            f&#34;Unable to logout user: {self.username}, status={result.status_code}&#34;
+        )
+
+    logger.debug(f&#34;Successfully logged out: {self.username}&#34;)
+    self.session = None</code></pre>
+</details>
+</dd>
 <dt id="pyhtcc.pyhtcc.PyHTCC.submit_raw_control_changes"><code class="name flex">
 <span>def <span class="ident">submit_raw_control_changes</span></span>(<span>self, device_id: int, other_data: dict) ‑> None</span>
 </code></dt>
@@ -1629,7 +1793,7 @@ the SubmitControlScreenChanges/ endpoint.</p></div>
 </dd>
 <dt id="pyhtcc.pyhtcc.Zone"><code class="flex name class">
 <span>class <span class="ident">Zone</span></span>
-<span>(</span><span>device_id_or_zone_info: Union[int, str], pyhtcc: ~<a title="pyhtcc.pyhtcc.PyHTCC" href="#pyhtcc.pyhtcc.PyHTCC">PyHTCC</a>)</span>
+<span>(</span><span>device_id_or_zone_info: typing.Union[int, str], pyhtcc: "typing.TypeVar('<a title="pyhtcc.pyhtcc.PyHTCC" href="#pyhtcc.pyhtcc.PyHTCC">PyHTCC</a>')")</span>
 </code></dt>
 <dd>
 <div class="desc"><p>A Zone often equates to a given thermostat. The Zone object can be used to control the thermostat
@@ -2425,7 +2589,7 @@ This will also attempt to turn the thermostat to 'Heat'</p></div>
 </details>
 </dd>
 <dt id="pyhtcc.pyhtcc.Zone.set_temp_cool_setpoint"><code class="name flex">
-<span>def <span class="ident">set_temp_cool_setpoint</span></span>(<span>self, temp: int, end: Union[datetime.timedelta, datetime.time, ForwardRef(None)] = None) ‑> None</span>
+<span>def <span class="ident">set_temp_cool_setpoint</span></span>(<span>self, temp: int, end: typing.Union[datetime.timedelta, datetime.time, None] = None) ‑> None</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Sets a new temporary cool setpoint.
@@ -2472,7 +2636,7 @@ OR
 </details>
 </dd>
 <dt id="pyhtcc.pyhtcc.Zone.set_temp_heat_setpoint"><code class="name flex">
-<span>def <span class="ident">set_temp_heat_setpoint</span></span>(<span>self, temp: int, end: Union[datetime.timedelta, datetime.time, ForwardRef(None)] = None) ‑> None</span>
+<span>def <span class="ident">set_temp_heat_setpoint</span></span>(<span>self, temp: int, end: typing.Union[datetime.timedelta, datetime.time, None] = None) ‑> None</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Sets a new temporary heat setpoint.
@@ -2672,6 +2836,12 @@ More likely than not, most users need not use this call directly.</p></div>
 <h4><code><a title="pyhtcc.pyhtcc.LoginUnexpectedError" href="#pyhtcc.pyhtcc.LoginUnexpectedError">LoginUnexpectedError</a></code></h4>
 </li>
 <li>
+<h4><code><a title="pyhtcc.pyhtcc.LogoutFailureError" href="#pyhtcc.pyhtcc.LogoutFailureError">LogoutFailureError</a></code></h4>
+</li>
+<li>
+<h4><code><a title="pyhtcc.pyhtcc.NoSessionError" href="#pyhtcc.pyhtcc.NoSessionError">NoSessionError</a></code></h4>
+</li>
+<li>
 <h4><code><a title="pyhtcc.pyhtcc.NoZonesFoundError" href="#pyhtcc.pyhtcc.NoZonesFoundError">NoZonesFoundError</a></code></h4>
 </li>
 <li>
@@ -2681,6 +2851,7 @@ More likely than not, most users need not use this call directly.</p></div>
 <li><code><a title="pyhtcc.pyhtcc.PyHTCC.get_all_zones" href="#pyhtcc.pyhtcc.PyHTCC.get_all_zones">get_all_zones</a></code></li>
 <li><code><a title="pyhtcc.pyhtcc.PyHTCC.get_zone_by_name" href="#pyhtcc.pyhtcc.PyHTCC.get_zone_by_name">get_zone_by_name</a></code></li>
 <li><code><a title="pyhtcc.pyhtcc.PyHTCC.get_zones_info" href="#pyhtcc.pyhtcc.PyHTCC.get_zones_info">get_zones_info</a></code></li>
+<li><code><a title="pyhtcc.pyhtcc.PyHTCC.logout" href="#pyhtcc.pyhtcc.PyHTCC.logout">logout</a></code></li>
 <li><code><a title="pyhtcc.pyhtcc.PyHTCC.submit_raw_control_changes" href="#pyhtcc.pyhtcc.PyHTCC.submit_raw_control_changes">submit_raw_control_changes</a></code></li>
 </ul>
 </li>
