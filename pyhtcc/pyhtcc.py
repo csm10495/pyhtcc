@@ -524,7 +524,12 @@ class PyHTCC:
         Can raise various exceptions. Users are expected to use authenticate() instead of this method.
         """
         self.session = requests.session()
-        self.session.auth = (self.username, self.password)
+
+        # See https://github.com/psf/requests/issues/4564 for why we encode user/pass to bytes
+        self.session.auth = (
+            self.username.encode("utf-8"),
+            self.password.encode("utf-8"),
+        )
 
         logger.debug(f"Attempting authentication for {self.username}")
 

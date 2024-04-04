@@ -570,3 +570,6 @@ class TestPyHTCC:
             self.pyhtcc.logout()
 
         assert str(err.value) == "Unable to logout user: user, status=500"
+
+    def test_auth_gets_set_to_utf8_bytes(self):
+        assert self.mock_session.auth == (b"user", b"pass")
