@@ -2,18 +2,21 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.10.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.1">
 <title>pyhtcc.pyhtcc API documentation</title>
-<meta name="description" content="Holds implementation guts for PyHTCC" />
-<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
-<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
-<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
-<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
-<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<meta name="description" content="Holds implementation guts for PyHTCC">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
 <style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
-<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+})</script>
 </head>
 <body>
 <main>
@@ -23,846 +26,6 @@
 </header>
 <section id="section-intro">
 <p>Holds implementation guts for PyHTCC</p>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">&#34;&#34;&#34;
-Holds implementation guts for PyHTCC
-&#34;&#34;&#34;
-from __future__ import annotations
-
-import datetime
-import enum
-import functools
-import os
-import re
-import time
-import typing
-
-import requests  # depends
-
-# logging setup
-from csmlog import getLogger, setup  # depends
-from deprecated import deprecated  # depends
-
-setup(&#34;pyhtcc&#34;)
-logger = getLogger(__file__)
-
-
-class AuthenticationError(ValueError):
-    &#34;&#34;&#34;denoted if we are completely unable to authenticate (even after exponential backoff)&#34;&#34;&#34;
-
-    pass
-
-
-class LoginCredentialsInvalidError(ValueError):
-    &#34;&#34;&#34;denoted if it appears as though invalid login credentials were given&#34;&#34;&#34;
-
-    pass
-
-
-class UnauthorizedError(ValueError):
-    &#34;&#34;&#34;denoted if we are logged in, but received something akin to a 401 error&#34;&#34;&#34;
-
-    pass
-
-
-class LogoutFailureError(ValueError):
-    &#34;&#34;&#34;denoted if we are unable to logout&#34;&#34;&#34;
-
-    pass
-
-
-class NoSessionError(ValueError):
-    &#34;&#34;&#34;denotes if we have no logged in session&#34;&#34;&#34;
-
-    pass
-
-
-class UnexpectedError(EnvironmentError):
-    &#34;&#34;&#34;raised if a non json response denotes an unexpected error&#34;&#34;&#34;
-
-    pass
-
-
-class LoginUnexpectedError(UnexpectedError):
-    &#34;&#34;&#34;raised if we logged in, but the site says that there was an unexpected error via redirect&#34;&#34;&#34;
-
-    pass
-
-
-class TooManyAttemptsError(EnvironmentError):
-    &#34;&#34;&#34;raised if attempting to authenticate led to us being told we&#39;ve tried too many times&#34;&#34;&#34;
-
-    pass
-
-
-class RedirectDidNotHappenError(EnvironmentError):
-    &#34;&#34;&#34;raised if we logged in, but the expected redirect didn&#39;t happen&#34;&#34;&#34;
-
-    pass
-
-
-class ZoneNotFoundError(EnvironmentError):
-    &#34;&#34;&#34;raised if the zone could not be found on refresh&#34;&#34;&#34;
-
-    pass
-
-
-class NoZonesFoundError(EnvironmentError):
-    &#34;&#34;&#34;Raised if there appear to be no zones in our current location&#34;&#34;&#34;
-
-    pass
-
-
-class SystemMode(enum.IntEnum):
-    &#34;&#34;&#34;
-    Enum for which mode the system is currently using
-    &#34;&#34;&#34;
-
-    EMHeat = 0
-    Heat = 1
-    Off = 2
-    Cool = 3
-    AutoHeat = 4
-    AutoCool = 5
-    SouthernAway = 6
-    Unknown = 7
-
-
-class FanMode(enum.IntEnum):
-    &#34;&#34;&#34;
-    Enum for which mode the fan is currently using
-    &#34;&#34;&#34;
-
-    Auto = 0
-    On = 1
-    Circulate = 2
-    FollowSchedule = 3
-    Unknown = 4
-
-
-class Zone:
-    &#34;&#34;&#34;
-    A Zone often equates to a given thermostat. The Zone object can be used to control the thermostat
-        for the given zone.
-    &#34;&#34;&#34;
-
-    def __init__(
-        self,
-        device_id_or_zone_info: typing.Union[int, str],
-        pyhtcc: typing.TypeVar(&#34;PyHTCC&#34;),
-    ):
-        &#34;&#34;&#34;
-        Initializer for a Zone object.
-        Takes in a device_id or zone info dict object as the first param.
-        Also takes in an authenticated instance of an PyHTCC object
-        &#34;&#34;&#34;
-        if isinstance(device_id_or_zone_info, int):
-            self.device_id = device_id_or_zone_info
-            self.zone_info = {}
-        elif isinstance(device_id_or_zone_info, dict):
-            self.device_id = device_id_or_zone_info[&#34;DeviceID&#34;]
-            self.zone_info = device_id_or_zone_info
-
-        self.pyhtcc = pyhtcc
-
-        if not self.zone_info:
-            # will create/populate self.zone_info
-            self.refresh_zone_info()
-
-    def refresh_zone_info(self) -&gt; None:
-        &#34;&#34;&#34;refreshes the zone_info attribute&#34;&#34;&#34;
-        all_zones_info = self.pyhtcc.get_zones_info()
-        for z in all_zones_info:
-            if z[&#34;DeviceID&#34;] == self.device_id:
-                logger.debug(&#34;Refreshed zone info for {self.device_id}&#34;)
-                self.zone_info = z
-                return
-
-        raise ZoneNotFoundError(f&#34;Missing device: {self.device_id}&#34;)
-
-    def get_name(self) -&gt; str:
-        &#34;&#34;&#34;gets the name corresponding with this Zone&#34;&#34;&#34;
-        return self.zone_info[&#34;Name&#34;]
-
-    def _get_with_unit(self, raw) -&gt; str:
-        &#34;&#34;&#34;takes the raw and adds a degree sign and a unit&#34;&#34;&#34;
-        disp_unit = self.zone_info[&#34;DispUnits&#34;]
-        return f&#34;{raw}°{disp_unit}&#34;
-
-    def get_system_mode(self) -&gt; SystemMode:
-        &#34;&#34;&#34;
-        refreshes the cached zone information then returns the current system mode
-        &#34;&#34;&#34;
-        self.refresh_zone_info()
-        return SystemMode(
-            self.zone_info[&#34;latestData&#34;][&#34;uiData&#34;][&#34;SystemSwitchPosition&#34;]
-        )
-
-    def is_equipment_output_on(self) -&gt; bool:
-        &#34;&#34;&#34;
-        Refreshes the cached zone information then Returns true if the EquipmentOutputStatus
-        is non 0. This typically meansthe system is heating/cooling.
-        &#34;&#34;&#34;
-        self.refresh_zone_info()
-        return bool(self.zone_info[&#34;latestData&#34;][&#34;uiData&#34;][&#34;EquipmentOutputStatus&#34;])
-
-    def is_calling_for_heat(self) -&gt; int:
-        &#34;&#34;&#34;
-        Refreshes the cached zone information and checks if the system mode is heating
-        &#34;&#34;&#34;
-        return (
-            self.get_system_mode()
-            in (SystemMode.Heat, SystemMode.AutoHeat, SystemMode.EMHeat)
-            and self.is_equipment_output_on()
-        )
-
-    def is_calling_for_cool(self) -&gt; int:
-        &#34;&#34;&#34;
-        Refreshes the cached zone information and checks if the system mode is cooling
-        &#34;&#34;&#34;
-        return (
-            self.get_system_mode() in (SystemMode.Cool, SystemMode.AutoCool)
-            and self.is_equipment_output_on()
-        )
-
-    def get_current_temperature_raw(self) -&gt; int:
-        &#34;&#34;&#34;gets the current temperature via refreshing the cached zone information&#34;&#34;&#34;
-        self.refresh_zone_info()
-        if self.zone_info[&#34;DispTempAvailable&#34;]:
-            return int(self.zone_info[&#34;DispTemp&#34;])
-
-        raise KeyError(&#34;Temperature is unavailable&#34;)
-
-    def get_current_temperature(self) -&gt; str:
-        &#34;&#34;&#34;calls get_current_temperature_raw() then adds on a degree sign and the display unit&#34;&#34;&#34;
-        raw = self.get_current_temperature_raw()
-        return self._get_with_unit(raw)
-
-    def get_fan_mode(self) -&gt; FanMode:
-        &#34;&#34;&#34;
-        refreshes the cached zone information then returns the current FanMode
-        &#34;&#34;&#34;
-        self.refresh_zone_info()
-        return FanMode(self.zone_info[&#34;latestData&#34;][&#34;fanData&#34;][&#34;fanMode&#34;])
-
-    def is_fan_running(self) -&gt; bool:
-        &#34;&#34;&#34;
-        refreshes the cached zone information then returns True if the fan is running
-        &#34;&#34;&#34;
-        self.refresh_zone_info()
-        return bool(self.zone_info[&#34;latestData&#34;][&#34;fanData&#34;][&#34;fanIsRunning&#34;])
-
-    def get_heat_setpoint_raw(self) -&gt; int:
-        &#34;&#34;&#34;refreshes the cached zone information then returns the heat setpoint&#34;&#34;&#34;
-        self.refresh_zone_info()
-        return int(self.zone_info[&#34;latestData&#34;][&#34;uiData&#34;][&#34;HeatSetpoint&#34;])
-
-    def get_cool_setpoint_raw(self) -&gt; int:
-        &#34;&#34;&#34;refreshes the cached zone information then returns the cool setpoint&#34;&#34;&#34;
-        self.refresh_zone_info()
-        return int(self.zone_info[&#34;latestData&#34;][&#34;uiData&#34;][&#34;CoolSetpoint&#34;])
-
-    def get_heat_setpoint(self) -&gt; str:
-        &#34;&#34;&#34;calls get_heat_setpoint_raw() then adds on a degree sign and the display unit&#34;&#34;&#34;
-        raw = self.get_heat_setpoint_raw()
-        return self._get_with_unit(raw)
-
-    def get_cool_setpoint(self) -&gt; str:
-        &#34;&#34;&#34;calls get_cool_setpoint_raw() then adds on a degree sign and the display unit&#34;&#34;&#34;
-        raw = self.get_cool_setpoint_raw()
-        return self._get_with_unit(raw)
-
-    def get_outdoor_temperature_raw(self) -&gt; int:
-        &#34;&#34;&#34;refreshes the cached zone information then returns the outdoor temperature raw value&#34;&#34;&#34;
-        self.refresh_zone_info()
-        return self.zone_info[&#34;OutdoorTemperature&#34;]
-
-    def get_outdoor_temperature(self) -&gt; str:
-        &#34;&#34;&#34;calls get_outdoor_temperature_raw() then returns it with a degree sign and the display unit&#34;&#34;&#34;
-        raw = self.get_outdoor_temperature_raw()
-        return self._get_with_unit(raw)
-
-    def get_indoor_temperature_raw(self) -&gt; int:
-        &#34;&#34;&#34;refreshes the cached zone information then returns the indoor temperature raw value&#34;&#34;&#34;
-        self.refresh_zone_info()
-        return self.zone_info[&#34;latestData&#34;][&#34;uiData&#34;][&#34;DispTemperature&#34;]
-
-    def get_indoor_temperature(self) -&gt; str:
-        &#34;&#34;&#34;calls get_indoor_temperature_raw() then returns it with a degree sign and the Display unit&#34;&#34;&#34;
-        raw = self.get_indoor_temperature_raw()
-        return self._get_with_unit(raw)
-
-    def get_indoor_humidity_raw(self) -&gt; int:
-        &#34;&#34;&#34;refreshes the cached zone information then returns the indoor humidity raw value&#34;&#34;&#34;
-        self.refresh_zone_info()
-        return self.zone_info[&#34;latestData&#34;][&#34;uiData&#34;][&#34;IndoorHumidity&#34;]
-
-    def get_indoor_humidity(self) -&gt; str:
-        &#34;&#34;&#34;calls get_indoor_humidity_raw() then returns it with a % display unit&#34;&#34;&#34;
-        raw = self.get_indoor_humidity_raw()
-        return str(raw) + str(&#34;%&#34;)
-
-    def submit_control_changes(self, data: dict) -&gt; None:
-        &#34;&#34;&#34;
-        This is a low-level API call to PyHTCC.submit_raw_control_changes().
-        More likely than not, most users need not use this call directly.
-        &#34;&#34;&#34;
-        return self.pyhtcc.submit_raw_control_changes(self.device_id, data)
-
-    @deprecated(
-        version=&#34;0.1.11&#34;,
-        reason=&#34;Use the correctly spelt: set_permanent_cool_setpoint() instead. set_permananent_cool_setpoint() will be removed in a future release.&#34;,
-    )
-    def set_permananent_cool_setpoint(self, temp: int) -&gt; None:
-        &#34;&#34;&#34;deprecated... this is a misspelling of set_permanent_cool_setpoint()&#34;&#34;&#34;
-        return self.set_permanent_cool_setpoint(temp)
-
-    def set_permanent_cool_setpoint(self, temp: int) -&gt; None:
-        &#34;&#34;&#34;
-        Sets a new permanent cool setpoint.
-        This will also attempt to turn the thermostat to &#39;Cool&#39;
-        &#34;&#34;&#34;
-        logger.info(f&#34;setting cool on with a target temp of: {temp}&#34;)
-        return self.submit_control_changes(
-            {&#34;CoolSetpoint&#34;: temp, &#34;StatusHeat&#34;: 2, &#34;StatusCool&#34;: 2, &#34;SystemSwitch&#34;: 3}
-        )
-
-    @deprecated(
-        version=&#34;0.1.11&#34;,
-        reason=&#34;Use the correctly spelt: set_permanent_heat_setpoint() instead. set_permananent_heat_setpoint() will be removed in a future release.&#34;,
-    )
-    def set_permananent_heat_setpoint(self, temp: int) -&gt; None:
-        &#34;&#34;&#34;deprecated... this is a misspelling of set_permanent_heat_setpoint()&#34;&#34;&#34;
-        return self.set_permanent_heat_setpoint(temp)
-
-    def set_permanent_heat_setpoint(self, temp: int) -&gt; None:
-        &#34;&#34;&#34;
-        Sets a new permanent heat setpoint.
-        This will also attempt to turn the thermostat to &#39;Heat&#39;
-        &#34;&#34;&#34;
-        logger.info(f&#34;setting heat on with a target temp of: {temp}&#34;)
-        return self.submit_control_changes(
-            {
-                &#34;HeatSetpoint&#34;: temp,
-                &#34;StatusHeat&#34;: 2,
-                &#34;StatusCool&#34;: 2,
-                &#34;SystemSwitch&#34;: 1,
-            }
-        )
-
-    def _coerce_temp_end_to_setpoint(
-        self, end: typing.Union[datetime.timedelta, datetime.time, None] = None
-    ) -&gt; typing.Union[None, int]:
-        &#34;&#34;&#34;
-        Takes the given end and converts it into a &#39;NextPeriod&#39; for use by submit_control_changes.
-        This field is a 15 minute-based field.. so 0 = midnight, 1 = 12:15am, 2 = 12:30am, etc.
-
-        a datetime.time translates directly while a datetime.timedelta will be a &#39;delta from now&#39;.
-        &#34;&#34;&#34;
-        ret = None
-        if isinstance(end, datetime.time):
-            ret = int((end.hour * 4) + round(end.minute / 15))
-        elif isinstance(end, datetime.timedelta):
-            if end.days &gt; 0:
-                raise ValueError(&#34;The timedelta must be less than a day&#34;)
-
-            the_end = datetime.datetime.now() + end
-            the_end_time = the_end.time()
-            ret = self._coerce_temp_end_to_setpoint(the_end_time)
-        elif isinstance(end, type(None)):
-            pass
-        else:
-            raise ValueError(
-                f&#34;end must be either a datetime.time or datetime.timedelta, not a {type(end)}&#34;
-            )
-
-        return ret
-
-    def set_temp_heat_setpoint(
-        self,
-        temp: int,
-        end: typing.Union[datetime.timedelta, datetime.time, None] = None,
-    ) -&gt; None:
-        &#34;&#34;&#34;
-        Sets a new temporary heat setpoint.
-        This will also attempt to turn the thermostat to &#39;Heat&#39;
-
-        If you provide an &#39;end&#39; it should be either:
-            - A datetime.timedelta for less than 24 hours from now
-            OR
-            - A datetime.time for a specific time of day (within the next 24 hours)
-            OR
-            - None corresponding with &#39;the thermostat will pick an end time&#39;
-
-        The end will automatically be rounded to the nearest 15 minute mark.
-        &#34;&#34;&#34;
-        logger.info(f&#34;setting temp heat on with a target temp of: {temp}&#34;)
-        return self.submit_control_changes(
-            {
-                &#34;HeatSetpoint&#34;: temp,
-                &#34;StatusHeat&#34;: 1,
-                &#34;StatusCool&#34;: 1,
-                &#34;SystemSwitch&#34;: 1,
-                &#34;HeatNextPeriod&#34;: self._coerce_temp_end_to_setpoint(end),
-            }
-        )
-
-    def set_temp_cool_setpoint(
-        self,
-        temp: int,
-        end: typing.Union[datetime.timedelta, datetime.time, None] = None,
-    ) -&gt; None:
-        &#34;&#34;&#34;
-        Sets a new temporary cool setpoint.
-        This will also attempt to turn the thermostat to &#39;Cool&#39;
-
-        If you provide an &#39;end&#39; it should be either:
-            - A datetime.timedelta for less than 24 hours from now
-            OR
-            - A datetime.time for a specific time of day (within the next 24 hours)
-            OR
-            - None corresponding with &#39;the thermostat will pick an end time&#39;
-
-        The end will automatically be rounded to the nearest 15 minute mark.
-        &#34;&#34;&#34;
-        logger.info(f&#34;setting temp heat on with a target temp of: {temp}&#34;)
-        return self.submit_control_changes(
-            {
-                &#34;CoolSetpoint&#34;: temp,
-                &#34;StatusHeat&#34;: 1,
-                &#34;StatusCool&#34;: 1,
-                &#34;SystemSwitch&#34;: 3,
-                &#34;CoolNextPeriod&#34;: self._coerce_temp_end_to_setpoint(end),
-            }
-        )
-
-    def end_hold(self) -&gt; None:
-        &#34;&#34;&#34;
-        Requests that the zone end its current hold.
-        Normally this tells the thermostat to resume its schedule.
-        &#34;&#34;&#34;
-        logger.info(&#34;ending hold&#34;)
-        return self.submit_control_changes(
-            {
-                &#34;StatusHeat&#34;: 0,
-                &#34;StatusCool&#34;: 0,
-            }
-        )
-
-    def turn_system_off(self) -&gt; None:
-        &#34;&#34;&#34;turns this thermostat off&#34;&#34;&#34;
-        logger.info(&#34;turning system off&#34;)
-        return self.submit_control_changes(
-            {
-                &#34;SystemSwitch&#34;: 2,
-            }
-        )
-
-    def turn_fan_on(self) -&gt; None:
-        &#34;&#34;&#34;turns the fan on&#34;&#34;&#34;
-        logger.info(&#34;turning fan on&#34;)
-        return self.submit_control_changes(
-            {
-                &#34;FanMode&#34;: 1,
-            }
-        )
-
-    def turn_fan_auto(self) -&gt; None:
-        &#34;&#34;&#34;turns the fan to auto&#34;&#34;&#34;
-        logger.info(&#34;turning fan to auto&#34;)
-        return self.submit_control_changes(
-            {
-                &#34;FanMode&#34;: 0,
-            }
-        )
-
-    def turn_fan_circulate(self) -&gt; None:
-        &#34;&#34;&#34;turns the fan to circulate&#34;&#34;&#34;
-        logger.info(&#34;turning fan circulate&#34;)
-        return self.submit_control_changes(
-            {
-                &#34;FanMode&#34;: 2,
-            }
-        )
-
-
-class PyHTCC:
-    &#34;&#34;&#34;
-    Class that represents a Python object to control a Honeywell Total Connect Comfort thermostat system
-    &#34;&#34;&#34;
-
-    def __init__(self, username: str, password: str):
-        &#34;&#34;&#34;
-        Initializer for the PyHTCC object. Will save username and password, then call authenticate().
-        &#34;&#34;&#34;
-        self.username = username
-        self.password = password
-        self._locationId = None
-        self.session = None
-
-        # self.session will be created in authenticate()
-        self.authenticate()
-
-    def authenticate(self) -&gt; None:
-        &#34;&#34;&#34;
-        Attempts to authenticate with mytotalconnectcomfort.com.
-        Internally this will do exponential backoff if the portal rejects our sign on request.
-
-        Note that the portal does have rate-limiting. This will attempt to retry with increasingly-long
-            sleep intervals if rate-limiting is preventing sign-on.
-        &#34;&#34;&#34;
-        for i in range(100):
-            logger.debug(f&#34;Starting authentication attempt #{i + 1}&#34;)
-            try:
-                return self._do_authenticate()
-            except (
-                TooManyAttemptsError,
-                RedirectDidNotHappenError,
-                LoginUnexpectedError,
-            ):
-                logger.exception(&#34;Unable to authenticate at this moment&#34;)
-                num_seconds = 2**i
-                logger.debug(f&#34;Sleeping for {num_seconds} seconds&#34;)
-                time.sleep(num_seconds)
-
-        raise AuthenticationError(&#34;Unable to authenticate. Ran out of tries&#34;)
-
-    def _ensure_session(func) -&gt; None:
-        &#34;&#34;&#34;
-        Will raise if we do not have a session to work with
-        &#34;&#34;&#34;
-
-        @functools.wraps(func)
-        def decorator(self, *args, **kwargs):
-            if self.session is None:
-                raise NoSessionError(
-                    &#34;Session is unavailable. Did you logout and forget to call authenticate() again?&#34;
-                )
-            return func(self, *args, **kwargs)
-
-        return decorator
-
-    def _do_authenticate(self) -&gt; None:
-        &#34;&#34;&#34;
-        Attempts to perform the actual authentication.
-        Will set: self.session and self._locationId
-
-        Can raise various exceptions. Users are expected to use authenticate() instead of this method.
-        &#34;&#34;&#34;
-        self.session = requests.session()
-
-        # See https://github.com/psf/requests/issues/4564 for why we encode user/pass to bytes
-        self.session.auth = (
-            self.username.encode(&#34;utf-8&#34;),
-            self.password.encode(&#34;utf-8&#34;),
-        )
-
-        logger.debug(f&#34;Attempting authentication for {self.username}&#34;)
-
-        result = self.session.post(
-            &#34;https://mytotalconnectcomfort.com/portal&#34;,
-            {
-                &#34;UserName&#34;: self.username,
-                &#34;Password&#34;: self.password,
-            },
-        )
-
-        if result.status_code != 200:
-            raise AuthenticationError(
-                f&#34;Unable to authenticate as {self.username}. Status was: {result.status_code}&#34;
-            )
-
-        if (
-            &#34;The email or password provided is incorrect&#34; in result.text
-            or &#34;The email address is not in the correct format&#34; in result.text
-        ):
-            raise LoginCredentialsInvalidError(
-                f&#34;Email ({self.username}) and/or password appear to have been rejected&#34;
-            )
-
-        logger.debug(f&#34;resulting url from authentication: {result.url}&#34;)
-
-        if &#34;TooManyAttempts&#34; in result.url:
-            raise TooManyAttemptsError(
-                &#34;url denoted that we have made too many attempts&#34;
-            )
-
-        if &#34;portal/&#34; not in result.url:
-            raise RedirectDidNotHappenError(
-                f&#34;{result.url} did not represent the needed redirect&#34;
-            )
-
-        if &#34;/Error&#34; in result.url:
-            raise LoginUnexpectedError(f&#34;{result.url} denotes an error&#34;)
-
-        self._set_location_id_from_result(result)
-
-    @_ensure_session
-    def logout(self) -&gt; None:
-        &#34;&#34;&#34;
-        Attempts to logout from mytotalconnectcomfort.com.
-
-        Note that after calling this function, you must call authenticate() to login and get a new session.
-        &#34;&#34;&#34;
-        logger.debug(f&#34;Attempting to logout user: {self.username}&#34;)
-        result = self.session.get(
-            &#34;https://mytotalconnectcomfort.com/portal/Account/LogOff&#34;
-        )
-        if not result.ok:
-            raise LogoutFailureError(
-                f&#34;Unable to logout user: {self.username}, status={result.status_code}&#34;
-            )
-
-        logger.debug(f&#34;Successfully logged out: {self.username}&#34;)
-        self.session = None
-
-    def _set_location_id_from_result(self, result):
-        &#34;&#34;&#34;
-        Attempts to find the location id first from the url then if that fails, in the result&#39;s text content
-        &#34;&#34;&#34;
-        try:
-            self._locationId = int(result.url.split(&#34;portal/&#34;)[1].split(&#34;/&#34;)[0])
-        except ValueError:
-            logger.debug(
-                &#34;Unable to grab location id via url... checking content instead&#34;
-            )
-            self._locationId = int(re.findall(r&#34;locationId=(\d+)&#34;, result.text)[0])
-
-        logger.debug(f&#34;location id is {self._locationId}&#34;)
-
-    @functools.lru_cache(maxsize=None)
-    @_ensure_session
-    def _get_name_for_device_id(self, device_id: int) -&gt; str:
-        &#34;&#34;&#34;
-        Will ask via the api for the name corresponding with the device id.
-        Note that this actually greps the html for the name.
-        Note that this will only perform an HTTP request if we don&#39;t already have this device_id&#39;s name cached
-        &#34;&#34;&#34;
-        # grab the name from the portal
-        result = self.session.get(
-            f&#34;https://mytotalconnectcomfort.com/portal/Device/Control/{device_id}?page=1&#34;
-        )
-        result.raise_for_status()
-
-        name = re.findall(r&#39;id=\s?&#34;ZoneName&#34;\s?&gt;(.*) Control&lt;&#39;, result.text)[0]
-        logger.debug(f&#34;Called portal to say {device_id} -&gt; {name}&#34;)
-        return name
-
-    @_ensure_session
-    def _get_outdoor_weather_info_for_zone(self, device_id: int) -&gt; dict:
-        &#34;&#34;&#34;
-        Private API to find the outdoor information on one of the logged in pages
-        &#34;&#34;&#34;
-        result = self.session.get(
-            f&#34;https://mytotalconnectcomfort.com/portal/Device/Control/{device_id}?page=1&#34;
-        )
-        result.raise_for_status()
-
-        text_data = result.text
-        try:
-            outdoor_temp = int(
-                float(
-                    text_data.split(&#34;Control.Model.Property.outdoorTemp,&#34;)[1]
-                    .split(&#34;)&#34;, 1)[0]
-                    .strip()
-                )
-            )
-        except:
-            logger.exception(&#34;Unable to find the outdoor temperature.&#34;)
-            outdoor_temp = None
-
-        try:
-            outdoor_humidity = int(
-                float(
-                    text_data.split(&#34;Control.Model.Property.outdoorHumidity,&#34;)[1]
-                    .split(&#34;)&#34;, 1)[0]
-                    .strip()
-                )
-            )
-        except:
-            logger.exception(&#34;Unable to find the outdoor humidity.&#34;)
-            outdoor_humidity = None
-
-        return {
-            &#34;OutdoorTemperature&#34;: outdoor_temp,
-            &#34;OutdoorHumidity&#34;: outdoor_humidity,
-        }
-
-    def _post_zone_list_data(self, page_num: int) -&gt; typing.Optional[dict]:
-        &#34;&#34;&#34;
-        Private function to call the GetZoneListData api. On success returns the json data.
-
-        Internally this function will catch UnexpectedError as that is expected when we read beyond the last page.
-
-        See tests for sample output.
-        &#34;&#34;&#34;
-        try:
-            return self._request_json(
-                &#34;POST&#34;,
-                f&#34;https://mytotalconnectcomfort.com/portal/Device/GetZoneListData?locationId={self._locationId}&amp;page={page_num}&#34;,
-            )
-        except UnexpectedError:
-            return None
-
-    def _get_check_data_session(self, device_id: int) -&gt; dict:
-        &#34;&#34;&#34;
-        Private function to call the CheckDataSession api. On success returns the json data.
-
-        See tests for sample output.
-        &#34;&#34;&#34;
-        return self._request_json(
-            &#34;GET&#34;,
-            f&#34;https://mytotalconnectcomfort.com/portal/Device/CheckDataSession/{device_id}&#34;,
-        )
-
-    @_ensure_session
-    def _request_json(
-        self, method: str, url: str, data: typing.Optional[dict] = None
-    ) -&gt; dict:
-        &#34;&#34;&#34;
-        Private function to make a request and return the json data.
-
-        Will attempt to sanity check the response and raise appropriate exceptions if something appears wrong.
-        &#34;&#34;&#34;
-        result = self.session.request(
-            method,
-            url,
-            json=data,
-            headers={
-                &#34;accept&#34;: &#34;application/json&#34;,
-                &#34;X-Requested-With&#34;: &#34;XMLHttpRequest&#34;,
-            },
-        )
-
-        try:
-            result_json = result.json()
-        except requests.exceptions.JSONDecodeError:
-            result_json = None
-
-        if result.status_code != 200 or result_json is None:
-            logger.error(
-                f&#34;Got unexpected response from {url}: {result.status_code}. Data was:\n {result.text}&#34;
-            )
-
-            if (
-                &#34;Unauthorized: Access is denied due to invalid credentials&#34;
-                in result.text
-                or result.status_code == 401
-            ):
-                raise UnauthorizedError(&#34;Got unauthorized response from server&#34;)
-
-            raise UnexpectedError(&#34;Expected json data in the response&#34;)
-
-        return result_json
-
-    def get_zones_info(self) -&gt; list:
-        &#34;&#34;&#34;
-        Returns a list of dicts corresponding with each one corresponding to a particular zone.
-        &#34;&#34;&#34;
-        zones = []
-        for page_num in range(1, 6):
-            logger.debug(
-                f&#34;Attempting to get zones for location id, page: {self._locationId}, {page_num}&#34;
-            )
-            data = self._post_zone_list_data(page_num)
-            if page_num == 1 and not data:
-                raise NoZonesFoundError(&#34;No zones were found from GetZoneListData&#34;)
-            elif not data:
-                # first empty page means we&#39;re done
-                logger.debug(f&#34;page {page_num} is empty&#34;)
-                break
-
-            # once we go to an empty page, we&#39;re done. Luckily it returns empty json instead of erroring
-            if not data:
-                logger.debug(f&#34;page {page_num} is empty&#34;)
-                break
-
-            zones.extend(data)
-
-        # add name (and additional info) to zone info
-        for idx, zone in enumerate(zones):
-            device_id = zone[&#34;DeviceID&#34;]
-            name = self._get_name_for_device_id(device_id)
-            zone[&#34;Name&#34;] = name
-
-            device_id = zone[&#34;DeviceID&#34;]
-            more_data = self._get_check_data_session(device_id)
-
-            zones[idx] = {
-                **zone,
-                **more_data,
-                **self._get_outdoor_weather_info_for_zone(device_id),
-            }
-
-        return zones
-
-    def get_all_zones(self) -&gt; list:
-        &#34;&#34;&#34;
-        Returns a list of Zone objects, corresponding with an object per zone on the account.
-        &#34;&#34;&#34;
-        return [Zone(a, self) for a in self.get_zones_info()]
-
-    def get_zone_by_name(self, name) -&gt; Zone:
-        &#34;&#34;&#34;
-        Will grab a Zone object for the given device name (not device id)
-        &#34;&#34;&#34;
-
-        zone_info = self.get_zones_info()
-        for a in zone_info:
-            if a[&#34;Name&#34;] == name:
-                return Zone(a, self)
-
-        raise NameError(f&#34;Could not find a zone with the given name: {name}&#34;)
-
-    def submit_raw_control_changes(self, device_id: int, other_data: dict) -&gt; None:
-        &#34;&#34;&#34;
-        Simulates making changes to current thermostat settings in the UI via
-        the SubmitControlScreenChanges/ endpoint.
-        &#34;&#34;&#34;
-        # None seems to mean no change to this control
-        data = {
-            &#34;CoolNextPeriod&#34;: None,
-            &#34;CoolSetpoint&#34;: None,
-            &#34;DeviceID&#34;: device_id,
-            &#34;FanMode&#34;: None,
-            &#34;HeatNextPeriod&#34;: None,
-            &#34;HeatSetpoint&#34;: None,
-            &#34;StatusCool&#34;: None,
-            &#34;StatusHeat&#34;: None,
-            &#34;SystemSwitch&#34;: None,
-        }
-
-        # overwrite defaults with passed in data
-        for k, v in other_data.items():
-            if k not in data:
-                raise KeyError(
-                    f&#34;Key: {k} was not one of the valid keys: {list(sorted(data.keys()))}&#34;
-                )
-            data[k] = v
-
-        logger.debug(f&#34;Posting data to SubmitControlScreenChange: {data}&#34;)
-
-        json_data = self._request_json(
-            &#34;POST&#34;,
-            &#34;https://mytotalconnectcomfort.com/portal/Device/SubmitControlScreenChanges&#34;,
-            data=data,
-        )
-
-        if json_data[&#34;success&#34;] != 1:
-            raise ValueError(f&#34;Success was not returned (success!=1): {json_data}&#34;)
-
-
-if __name__ == &#34;__main__&#34;:
-    email = os.environ.get(&#34;PYHTCC_EMAIL&#34;)
-    pw = os.environ.get(&#34;PYHTCC_PASS&#34;)
-    if email and pw:
-        h = PyHTCC(email, pw)
-    else:
-        print(&#34;Warning: no PYHTCC_EMAIL and PYHTCC_PASS were not set!&#34;)</code></pre>
-</details>
 </section>
 <section>
 </section>
@@ -1444,123 +607,24 @@ if __name__ == &#34;__main__&#34;:
 Internally this will do exponential backoff if the portal rejects our sign on request.</p>
 <p>Note that the portal does have rate-limiting. This will attempt to retry with increasingly-long
 sleep intervals if rate-limiting is preventing sign-on.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def authenticate(self) -&gt; None:
-    &#34;&#34;&#34;
-    Attempts to authenticate with mytotalconnectcomfort.com.
-    Internally this will do exponential backoff if the portal rejects our sign on request.
-
-    Note that the portal does have rate-limiting. This will attempt to retry with increasingly-long
-        sleep intervals if rate-limiting is preventing sign-on.
-    &#34;&#34;&#34;
-    for i in range(100):
-        logger.debug(f&#34;Starting authentication attempt #{i + 1}&#34;)
-        try:
-            return self._do_authenticate()
-        except (
-            TooManyAttemptsError,
-            RedirectDidNotHappenError,
-            LoginUnexpectedError,
-        ):
-            logger.exception(&#34;Unable to authenticate at this moment&#34;)
-            num_seconds = 2**i
-            logger.debug(f&#34;Sleeping for {num_seconds} seconds&#34;)
-            time.sleep(num_seconds)
-
-    raise AuthenticationError(&#34;Unable to authenticate. Ran out of tries&#34;)</code></pre>
-</details>
 </dd>
 <dt id="pyhtcc.pyhtcc.PyHTCC.get_all_zones"><code class="name flex">
 <span>def <span class="ident">get_all_zones</span></span>(<span>self) ‑> list</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Returns a list of Zone objects, corresponding with an object per zone on the account.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_all_zones(self) -&gt; list:
-    &#34;&#34;&#34;
-    Returns a list of Zone objects, corresponding with an object per zone on the account.
-    &#34;&#34;&#34;
-    return [Zone(a, self) for a in self.get_zones_info()]</code></pre>
-</details>
 </dd>
 <dt id="pyhtcc.pyhtcc.PyHTCC.get_zone_by_name"><code class="name flex">
 <span>def <span class="ident">get_zone_by_name</span></span>(<span>self, name) ‑> <a title="pyhtcc.pyhtcc.Zone" href="#pyhtcc.pyhtcc.Zone">Zone</a></span>
 </code></dt>
 <dd>
 <div class="desc"><p>Will grab a Zone object for the given device name (not device id)</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_zone_by_name(self, name) -&gt; Zone:
-    &#34;&#34;&#34;
-    Will grab a Zone object for the given device name (not device id)
-    &#34;&#34;&#34;
-
-    zone_info = self.get_zones_info()
-    for a in zone_info:
-        if a[&#34;Name&#34;] == name:
-            return Zone(a, self)
-
-    raise NameError(f&#34;Could not find a zone with the given name: {name}&#34;)</code></pre>
-</details>
 </dd>
 <dt id="pyhtcc.pyhtcc.PyHTCC.get_zones_info"><code class="name flex">
 <span>def <span class="ident">get_zones_info</span></span>(<span>self) ‑> list</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Returns a list of dicts corresponding with each one corresponding to a particular zone.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_zones_info(self) -&gt; list:
-    &#34;&#34;&#34;
-    Returns a list of dicts corresponding with each one corresponding to a particular zone.
-    &#34;&#34;&#34;
-    zones = []
-    for page_num in range(1, 6):
-        logger.debug(
-            f&#34;Attempting to get zones for location id, page: {self._locationId}, {page_num}&#34;
-        )
-        data = self._post_zone_list_data(page_num)
-        if page_num == 1 and not data:
-            raise NoZonesFoundError(&#34;No zones were found from GetZoneListData&#34;)
-        elif not data:
-            # first empty page means we&#39;re done
-            logger.debug(f&#34;page {page_num} is empty&#34;)
-            break
-
-        # once we go to an empty page, we&#39;re done. Luckily it returns empty json instead of erroring
-        if not data:
-            logger.debug(f&#34;page {page_num} is empty&#34;)
-            break
-
-        zones.extend(data)
-
-    # add name (and additional info) to zone info
-    for idx, zone in enumerate(zones):
-        device_id = zone[&#34;DeviceID&#34;]
-        name = self._get_name_for_device_id(device_id)
-        zone[&#34;Name&#34;] = name
-
-        device_id = zone[&#34;DeviceID&#34;]
-        more_data = self._get_check_data_session(device_id)
-
-        zones[idx] = {
-            **zone,
-            **more_data,
-            **self._get_outdoor_weather_info_for_zone(device_id),
-        }
-
-    return zones</code></pre>
-</details>
 </dd>
 <dt id="pyhtcc.pyhtcc.PyHTCC.logout"><code class="name flex">
 <span>def <span class="ident">logout</span></span>(<span>self) ‑> None</span>
@@ -1568,29 +632,6 @@ sleep intervals if rate-limiting is preventing sign-on.</p></div>
 <dd>
 <div class="desc"><p>Attempts to logout from mytotalconnectcomfort.com.</p>
 <p>Note that after calling this function, you must call authenticate() to login and get a new session.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">@_ensure_session
-def logout(self) -&gt; None:
-    &#34;&#34;&#34;
-    Attempts to logout from mytotalconnectcomfort.com.
-
-    Note that after calling this function, you must call authenticate() to login and get a new session.
-    &#34;&#34;&#34;
-    logger.debug(f&#34;Attempting to logout user: {self.username}&#34;)
-    result = self.session.get(
-        &#34;https://mytotalconnectcomfort.com/portal/Account/LogOff&#34;
-    )
-    if not result.ok:
-        raise LogoutFailureError(
-            f&#34;Unable to logout user: {self.username}, status={result.status_code}&#34;
-        )
-
-    logger.debug(f&#34;Successfully logged out: {self.username}&#34;)
-    self.session = None</code></pre>
-</details>
 </dd>
 <dt id="pyhtcc.pyhtcc.PyHTCC.submit_raw_control_changes"><code class="name flex">
 <span>def <span class="ident">submit_raw_control_changes</span></span>(<span>self, device_id: int, other_data: dict) ‑> None</span>
@@ -1598,47 +639,6 @@ def logout(self) -&gt; None:
 <dd>
 <div class="desc"><p>Simulates making changes to current thermostat settings in the UI via
 the SubmitControlScreenChanges/ endpoint.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def submit_raw_control_changes(self, device_id: int, other_data: dict) -&gt; None:
-    &#34;&#34;&#34;
-    Simulates making changes to current thermostat settings in the UI via
-    the SubmitControlScreenChanges/ endpoint.
-    &#34;&#34;&#34;
-    # None seems to mean no change to this control
-    data = {
-        &#34;CoolNextPeriod&#34;: None,
-        &#34;CoolSetpoint&#34;: None,
-        &#34;DeviceID&#34;: device_id,
-        &#34;FanMode&#34;: None,
-        &#34;HeatNextPeriod&#34;: None,
-        &#34;HeatSetpoint&#34;: None,
-        &#34;StatusCool&#34;: None,
-        &#34;StatusHeat&#34;: None,
-        &#34;SystemSwitch&#34;: None,
-    }
-
-    # overwrite defaults with passed in data
-    for k, v in other_data.items():
-        if k not in data:
-            raise KeyError(
-                f&#34;Key: {k} was not one of the valid keys: {list(sorted(data.keys()))}&#34;
-            )
-        data[k] = v
-
-    logger.debug(f&#34;Posting data to SubmitControlScreenChange: {data}&#34;)
-
-    json_data = self._request_json(
-        &#34;POST&#34;,
-        &#34;https://mytotalconnectcomfort.com/portal/Device/SubmitControlScreenChanges&#34;,
-        data=data,
-    )
-
-    if json_data[&#34;success&#34;] != 1:
-        raise ValueError(f&#34;Success was not returned (success!=1): {json_data}&#34;)</code></pre>
-</details>
 </dd>
 </dl>
 </dd>
@@ -2168,295 +1168,108 @@ Also takes in an authenticated instance of an PyHTCC object</p></div>
 <dd>
 <div class="desc"><p>Requests that the zone end its current hold.
 Normally this tells the thermostat to resume its schedule.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def end_hold(self) -&gt; None:
-    &#34;&#34;&#34;
-    Requests that the zone end its current hold.
-    Normally this tells the thermostat to resume its schedule.
-    &#34;&#34;&#34;
-    logger.info(&#34;ending hold&#34;)
-    return self.submit_control_changes(
-        {
-            &#34;StatusHeat&#34;: 0,
-            &#34;StatusCool&#34;: 0,
-        }
-    )</code></pre>
-</details>
 </dd>
 <dt id="pyhtcc.pyhtcc.Zone.get_cool_setpoint"><code class="name flex">
 <span>def <span class="ident">get_cool_setpoint</span></span>(<span>self) ‑> str</span>
 </code></dt>
 <dd>
 <div class="desc"><p>calls get_cool_setpoint_raw() then adds on a degree sign and the display unit</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_cool_setpoint(self) -&gt; str:
-    &#34;&#34;&#34;calls get_cool_setpoint_raw() then adds on a degree sign and the display unit&#34;&#34;&#34;
-    raw = self.get_cool_setpoint_raw()
-    return self._get_with_unit(raw)</code></pre>
-</details>
 </dd>
 <dt id="pyhtcc.pyhtcc.Zone.get_cool_setpoint_raw"><code class="name flex">
 <span>def <span class="ident">get_cool_setpoint_raw</span></span>(<span>self) ‑> int</span>
 </code></dt>
 <dd>
 <div class="desc"><p>refreshes the cached zone information then returns the cool setpoint</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_cool_setpoint_raw(self) -&gt; int:
-    &#34;&#34;&#34;refreshes the cached zone information then returns the cool setpoint&#34;&#34;&#34;
-    self.refresh_zone_info()
-    return int(self.zone_info[&#34;latestData&#34;][&#34;uiData&#34;][&#34;CoolSetpoint&#34;])</code></pre>
-</details>
 </dd>
 <dt id="pyhtcc.pyhtcc.Zone.get_current_temperature"><code class="name flex">
 <span>def <span class="ident">get_current_temperature</span></span>(<span>self) ‑> str</span>
 </code></dt>
 <dd>
 <div class="desc"><p>calls get_current_temperature_raw() then adds on a degree sign and the display unit</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_current_temperature(self) -&gt; str:
-    &#34;&#34;&#34;calls get_current_temperature_raw() then adds on a degree sign and the display unit&#34;&#34;&#34;
-    raw = self.get_current_temperature_raw()
-    return self._get_with_unit(raw)</code></pre>
-</details>
 </dd>
 <dt id="pyhtcc.pyhtcc.Zone.get_current_temperature_raw"><code class="name flex">
 <span>def <span class="ident">get_current_temperature_raw</span></span>(<span>self) ‑> int</span>
 </code></dt>
 <dd>
 <div class="desc"><p>gets the current temperature via refreshing the cached zone information</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_current_temperature_raw(self) -&gt; int:
-    &#34;&#34;&#34;gets the current temperature via refreshing the cached zone information&#34;&#34;&#34;
-    self.refresh_zone_info()
-    if self.zone_info[&#34;DispTempAvailable&#34;]:
-        return int(self.zone_info[&#34;DispTemp&#34;])
-
-    raise KeyError(&#34;Temperature is unavailable&#34;)</code></pre>
-</details>
 </dd>
 <dt id="pyhtcc.pyhtcc.Zone.get_fan_mode"><code class="name flex">
 <span>def <span class="ident">get_fan_mode</span></span>(<span>self) ‑> <a title="pyhtcc.pyhtcc.FanMode" href="#pyhtcc.pyhtcc.FanMode">FanMode</a></span>
 </code></dt>
 <dd>
 <div class="desc"><p>refreshes the cached zone information then returns the current FanMode</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_fan_mode(self) -&gt; FanMode:
-    &#34;&#34;&#34;
-    refreshes the cached zone information then returns the current FanMode
-    &#34;&#34;&#34;
-    self.refresh_zone_info()
-    return FanMode(self.zone_info[&#34;latestData&#34;][&#34;fanData&#34;][&#34;fanMode&#34;])</code></pre>
-</details>
 </dd>
 <dt id="pyhtcc.pyhtcc.Zone.get_heat_setpoint"><code class="name flex">
 <span>def <span class="ident">get_heat_setpoint</span></span>(<span>self) ‑> str</span>
 </code></dt>
 <dd>
 <div class="desc"><p>calls get_heat_setpoint_raw() then adds on a degree sign and the display unit</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_heat_setpoint(self) -&gt; str:
-    &#34;&#34;&#34;calls get_heat_setpoint_raw() then adds on a degree sign and the display unit&#34;&#34;&#34;
-    raw = self.get_heat_setpoint_raw()
-    return self._get_with_unit(raw)</code></pre>
-</details>
 </dd>
 <dt id="pyhtcc.pyhtcc.Zone.get_heat_setpoint_raw"><code class="name flex">
 <span>def <span class="ident">get_heat_setpoint_raw</span></span>(<span>self) ‑> int</span>
 </code></dt>
 <dd>
 <div class="desc"><p>refreshes the cached zone information then returns the heat setpoint</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_heat_setpoint_raw(self) -&gt; int:
-    &#34;&#34;&#34;refreshes the cached zone information then returns the heat setpoint&#34;&#34;&#34;
-    self.refresh_zone_info()
-    return int(self.zone_info[&#34;latestData&#34;][&#34;uiData&#34;][&#34;HeatSetpoint&#34;])</code></pre>
-</details>
 </dd>
 <dt id="pyhtcc.pyhtcc.Zone.get_indoor_humidity"><code class="name flex">
 <span>def <span class="ident">get_indoor_humidity</span></span>(<span>self) ‑> str</span>
 </code></dt>
 <dd>
 <div class="desc"><p>calls get_indoor_humidity_raw() then returns it with a % display unit</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_indoor_humidity(self) -&gt; str:
-    &#34;&#34;&#34;calls get_indoor_humidity_raw() then returns it with a % display unit&#34;&#34;&#34;
-    raw = self.get_indoor_humidity_raw()
-    return str(raw) + str(&#34;%&#34;)</code></pre>
-</details>
 </dd>
 <dt id="pyhtcc.pyhtcc.Zone.get_indoor_humidity_raw"><code class="name flex">
 <span>def <span class="ident">get_indoor_humidity_raw</span></span>(<span>self) ‑> int</span>
 </code></dt>
 <dd>
 <div class="desc"><p>refreshes the cached zone information then returns the indoor humidity raw value</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_indoor_humidity_raw(self) -&gt; int:
-    &#34;&#34;&#34;refreshes the cached zone information then returns the indoor humidity raw value&#34;&#34;&#34;
-    self.refresh_zone_info()
-    return self.zone_info[&#34;latestData&#34;][&#34;uiData&#34;][&#34;IndoorHumidity&#34;]</code></pre>
-</details>
 </dd>
 <dt id="pyhtcc.pyhtcc.Zone.get_indoor_temperature"><code class="name flex">
 <span>def <span class="ident">get_indoor_temperature</span></span>(<span>self) ‑> str</span>
 </code></dt>
 <dd>
 <div class="desc"><p>calls get_indoor_temperature_raw() then returns it with a degree sign and the Display unit</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_indoor_temperature(self) -&gt; str:
-    &#34;&#34;&#34;calls get_indoor_temperature_raw() then returns it with a degree sign and the Display unit&#34;&#34;&#34;
-    raw = self.get_indoor_temperature_raw()
-    return self._get_with_unit(raw)</code></pre>
-</details>
 </dd>
 <dt id="pyhtcc.pyhtcc.Zone.get_indoor_temperature_raw"><code class="name flex">
 <span>def <span class="ident">get_indoor_temperature_raw</span></span>(<span>self) ‑> int</span>
 </code></dt>
 <dd>
 <div class="desc"><p>refreshes the cached zone information then returns the indoor temperature raw value</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_indoor_temperature_raw(self) -&gt; int:
-    &#34;&#34;&#34;refreshes the cached zone information then returns the indoor temperature raw value&#34;&#34;&#34;
-    self.refresh_zone_info()
-    return self.zone_info[&#34;latestData&#34;][&#34;uiData&#34;][&#34;DispTemperature&#34;]</code></pre>
-</details>
 </dd>
 <dt id="pyhtcc.pyhtcc.Zone.get_name"><code class="name flex">
 <span>def <span class="ident">get_name</span></span>(<span>self) ‑> str</span>
 </code></dt>
 <dd>
 <div class="desc"><p>gets the name corresponding with this Zone</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_name(self) -&gt; str:
-    &#34;&#34;&#34;gets the name corresponding with this Zone&#34;&#34;&#34;
-    return self.zone_info[&#34;Name&#34;]</code></pre>
-</details>
 </dd>
 <dt id="pyhtcc.pyhtcc.Zone.get_outdoor_temperature"><code class="name flex">
 <span>def <span class="ident">get_outdoor_temperature</span></span>(<span>self) ‑> str</span>
 </code></dt>
 <dd>
 <div class="desc"><p>calls get_outdoor_temperature_raw() then returns it with a degree sign and the display unit</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_outdoor_temperature(self) -&gt; str:
-    &#34;&#34;&#34;calls get_outdoor_temperature_raw() then returns it with a degree sign and the display unit&#34;&#34;&#34;
-    raw = self.get_outdoor_temperature_raw()
-    return self._get_with_unit(raw)</code></pre>
-</details>
 </dd>
 <dt id="pyhtcc.pyhtcc.Zone.get_outdoor_temperature_raw"><code class="name flex">
 <span>def <span class="ident">get_outdoor_temperature_raw</span></span>(<span>self) ‑> int</span>
 </code></dt>
 <dd>
 <div class="desc"><p>refreshes the cached zone information then returns the outdoor temperature raw value</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_outdoor_temperature_raw(self) -&gt; int:
-    &#34;&#34;&#34;refreshes the cached zone information then returns the outdoor temperature raw value&#34;&#34;&#34;
-    self.refresh_zone_info()
-    return self.zone_info[&#34;OutdoorTemperature&#34;]</code></pre>
-</details>
 </dd>
 <dt id="pyhtcc.pyhtcc.Zone.get_system_mode"><code class="name flex">
 <span>def <span class="ident">get_system_mode</span></span>(<span>self) ‑> <a title="pyhtcc.pyhtcc.SystemMode" href="#pyhtcc.pyhtcc.SystemMode">SystemMode</a></span>
 </code></dt>
 <dd>
 <div class="desc"><p>refreshes the cached zone information then returns the current system mode</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_system_mode(self) -&gt; SystemMode:
-    &#34;&#34;&#34;
-    refreshes the cached zone information then returns the current system mode
-    &#34;&#34;&#34;
-    self.refresh_zone_info()
-    return SystemMode(
-        self.zone_info[&#34;latestData&#34;][&#34;uiData&#34;][&#34;SystemSwitchPosition&#34;]
-    )</code></pre>
-</details>
 </dd>
 <dt id="pyhtcc.pyhtcc.Zone.is_calling_for_cool"><code class="name flex">
 <span>def <span class="ident">is_calling_for_cool</span></span>(<span>self) ‑> int</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Refreshes the cached zone information and checks if the system mode is cooling</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def is_calling_for_cool(self) -&gt; int:
-    &#34;&#34;&#34;
-    Refreshes the cached zone information and checks if the system mode is cooling
-    &#34;&#34;&#34;
-    return (
-        self.get_system_mode() in (SystemMode.Cool, SystemMode.AutoCool)
-        and self.is_equipment_output_on()
-    )</code></pre>
-</details>
 </dd>
 <dt id="pyhtcc.pyhtcc.Zone.is_calling_for_heat"><code class="name flex">
 <span>def <span class="ident">is_calling_for_heat</span></span>(<span>self) ‑> int</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Refreshes the cached zone information and checks if the system mode is heating</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def is_calling_for_heat(self) -&gt; int:
-    &#34;&#34;&#34;
-    Refreshes the cached zone information and checks if the system mode is heating
-    &#34;&#34;&#34;
-    return (
-        self.get_system_mode()
-        in (SystemMode.Heat, SystemMode.AutoHeat, SystemMode.EMHeat)
-        and self.is_equipment_output_on()
-    )</code></pre>
-</details>
 </dd>
 <dt id="pyhtcc.pyhtcc.Zone.is_equipment_output_on"><code class="name flex">
 <span>def <span class="ident">is_equipment_output_on</span></span>(<span>self) ‑> bool</span>
@@ -2464,92 +1277,30 @@ Normally this tells the thermostat to resume its schedule.</p></div>
 <dd>
 <div class="desc"><p>Refreshes the cached zone information then Returns true if the EquipmentOutputStatus
 is non 0. This typically meansthe system is heating/cooling.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def is_equipment_output_on(self) -&gt; bool:
-    &#34;&#34;&#34;
-    Refreshes the cached zone information then Returns true if the EquipmentOutputStatus
-    is non 0. This typically meansthe system is heating/cooling.
-    &#34;&#34;&#34;
-    self.refresh_zone_info()
-    return bool(self.zone_info[&#34;latestData&#34;][&#34;uiData&#34;][&#34;EquipmentOutputStatus&#34;])</code></pre>
-</details>
 </dd>
 <dt id="pyhtcc.pyhtcc.Zone.is_fan_running"><code class="name flex">
 <span>def <span class="ident">is_fan_running</span></span>(<span>self) ‑> bool</span>
 </code></dt>
 <dd>
 <div class="desc"><p>refreshes the cached zone information then returns True if the fan is running</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def is_fan_running(self) -&gt; bool:
-    &#34;&#34;&#34;
-    refreshes the cached zone information then returns True if the fan is running
-    &#34;&#34;&#34;
-    self.refresh_zone_info()
-    return bool(self.zone_info[&#34;latestData&#34;][&#34;fanData&#34;][&#34;fanIsRunning&#34;])</code></pre>
-</details>
 </dd>
 <dt id="pyhtcc.pyhtcc.Zone.refresh_zone_info"><code class="name flex">
 <span>def <span class="ident">refresh_zone_info</span></span>(<span>self) ‑> None</span>
 </code></dt>
 <dd>
 <div class="desc"><p>refreshes the zone_info attribute</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def refresh_zone_info(self) -&gt; None:
-    &#34;&#34;&#34;refreshes the zone_info attribute&#34;&#34;&#34;
-    all_zones_info = self.pyhtcc.get_zones_info()
-    for z in all_zones_info:
-        if z[&#34;DeviceID&#34;] == self.device_id:
-            logger.debug(&#34;Refreshed zone info for {self.device_id}&#34;)
-            self.zone_info = z
-            return
-
-    raise ZoneNotFoundError(f&#34;Missing device: {self.device_id}&#34;)</code></pre>
-</details>
 </dd>
 <dt id="pyhtcc.pyhtcc.Zone.set_permananent_cool_setpoint"><code class="name flex">
 <span>def <span class="ident">set_permananent_cool_setpoint</span></span>(<span>self, temp: int) ‑> None</span>
 </code></dt>
 <dd>
 <div class="desc"><p>deprecated&hellip; this is a misspelling of set_permanent_cool_setpoint()</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">@deprecated(
-    version=&#34;0.1.11&#34;,
-    reason=&#34;Use the correctly spelt: set_permanent_cool_setpoint() instead. set_permananent_cool_setpoint() will be removed in a future release.&#34;,
-)
-def set_permananent_cool_setpoint(self, temp: int) -&gt; None:
-    &#34;&#34;&#34;deprecated... this is a misspelling of set_permanent_cool_setpoint()&#34;&#34;&#34;
-    return self.set_permanent_cool_setpoint(temp)</code></pre>
-</details>
 </dd>
 <dt id="pyhtcc.pyhtcc.Zone.set_permananent_heat_setpoint"><code class="name flex">
 <span>def <span class="ident">set_permananent_heat_setpoint</span></span>(<span>self, temp: int) ‑> None</span>
 </code></dt>
 <dd>
 <div class="desc"><p>deprecated&hellip; this is a misspelling of set_permanent_heat_setpoint()</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">@deprecated(
-    version=&#34;0.1.11&#34;,
-    reason=&#34;Use the correctly spelt: set_permanent_heat_setpoint() instead. set_permananent_heat_setpoint() will be removed in a future release.&#34;,
-)
-def set_permananent_heat_setpoint(self, temp: int) -&gt; None:
-    &#34;&#34;&#34;deprecated... this is a misspelling of set_permanent_heat_setpoint()&#34;&#34;&#34;
-    return self.set_permanent_heat_setpoint(temp)</code></pre>
-</details>
 </dd>
 <dt id="pyhtcc.pyhtcc.Zone.set_permanent_cool_setpoint"><code class="name flex">
 <span>def <span class="ident">set_permanent_cool_setpoint</span></span>(<span>self, temp: int) ‑> None</span>
@@ -2557,20 +1308,6 @@ def set_permananent_heat_setpoint(self, temp: int) -&gt; None:
 <dd>
 <div class="desc"><p>Sets a new permanent cool setpoint.
 This will also attempt to turn the thermostat to 'Cool'</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def set_permanent_cool_setpoint(self, temp: int) -&gt; None:
-    &#34;&#34;&#34;
-    Sets a new permanent cool setpoint.
-    This will also attempt to turn the thermostat to &#39;Cool&#39;
-    &#34;&#34;&#34;
-    logger.info(f&#34;setting cool on with a target temp of: {temp}&#34;)
-    return self.submit_control_changes(
-        {&#34;CoolSetpoint&#34;: temp, &#34;StatusHeat&#34;: 2, &#34;StatusCool&#34;: 2, &#34;SystemSwitch&#34;: 3}
-    )</code></pre>
-</details>
 </dd>
 <dt id="pyhtcc.pyhtcc.Zone.set_permanent_heat_setpoint"><code class="name flex">
 <span>def <span class="ident">set_permanent_heat_setpoint</span></span>(<span>self, temp: int) ‑> None</span>
@@ -2578,25 +1315,6 @@ This will also attempt to turn the thermostat to 'Cool'</p></div>
 <dd>
 <div class="desc"><p>Sets a new permanent heat setpoint.
 This will also attempt to turn the thermostat to 'Heat'</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def set_permanent_heat_setpoint(self, temp: int) -&gt; None:
-    &#34;&#34;&#34;
-    Sets a new permanent heat setpoint.
-    This will also attempt to turn the thermostat to &#39;Heat&#39;
-    &#34;&#34;&#34;
-    logger.info(f&#34;setting heat on with a target temp of: {temp}&#34;)
-    return self.submit_control_changes(
-        {
-            &#34;HeatSetpoint&#34;: temp,
-            &#34;StatusHeat&#34;: 2,
-            &#34;StatusCool&#34;: 2,
-            &#34;SystemSwitch&#34;: 1,
-        }
-    )</code></pre>
-</details>
 </dd>
 <dt id="pyhtcc.pyhtcc.Zone.set_temp_cool_setpoint"><code class="name flex">
 <span>def <span class="ident">set_temp_cool_setpoint</span></span>(<span>self, temp: int, end: typing.Union[datetime.timedelta, datetime.time, None] = None) ‑> None</span>
@@ -2611,39 +1329,6 @@ OR
 OR
 - None corresponding with 'the thermostat will pick an end time'</p>
 <p>The end will automatically be rounded to the nearest 15 minute mark.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def set_temp_cool_setpoint(
-    self,
-    temp: int,
-    end: typing.Union[datetime.timedelta, datetime.time, None] = None,
-) -&gt; None:
-    &#34;&#34;&#34;
-    Sets a new temporary cool setpoint.
-    This will also attempt to turn the thermostat to &#39;Cool&#39;
-
-    If you provide an &#39;end&#39; it should be either:
-        - A datetime.timedelta for less than 24 hours from now
-        OR
-        - A datetime.time for a specific time of day (within the next 24 hours)
-        OR
-        - None corresponding with &#39;the thermostat will pick an end time&#39;
-
-    The end will automatically be rounded to the nearest 15 minute mark.
-    &#34;&#34;&#34;
-    logger.info(f&#34;setting temp heat on with a target temp of: {temp}&#34;)
-    return self.submit_control_changes(
-        {
-            &#34;CoolSetpoint&#34;: temp,
-            &#34;StatusHeat&#34;: 1,
-            &#34;StatusCool&#34;: 1,
-            &#34;SystemSwitch&#34;: 3,
-            &#34;CoolNextPeriod&#34;: self._coerce_temp_end_to_setpoint(end),
-        }
-    )</code></pre>
-</details>
 </dd>
 <dt id="pyhtcc.pyhtcc.Zone.set_temp_heat_setpoint"><code class="name flex">
 <span>def <span class="ident">set_temp_heat_setpoint</span></span>(<span>self, temp: int, end: typing.Union[datetime.timedelta, datetime.time, None] = None) ‑> None</span>
@@ -2658,39 +1343,6 @@ OR
 OR
 - None corresponding with 'the thermostat will pick an end time'</p>
 <p>The end will automatically be rounded to the nearest 15 minute mark.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def set_temp_heat_setpoint(
-    self,
-    temp: int,
-    end: typing.Union[datetime.timedelta, datetime.time, None] = None,
-) -&gt; None:
-    &#34;&#34;&#34;
-    Sets a new temporary heat setpoint.
-    This will also attempt to turn the thermostat to &#39;Heat&#39;
-
-    If you provide an &#39;end&#39; it should be either:
-        - A datetime.timedelta for less than 24 hours from now
-        OR
-        - A datetime.time for a specific time of day (within the next 24 hours)
-        OR
-        - None corresponding with &#39;the thermostat will pick an end time&#39;
-
-    The end will automatically be rounded to the nearest 15 minute mark.
-    &#34;&#34;&#34;
-    logger.info(f&#34;setting temp heat on with a target temp of: {temp}&#34;)
-    return self.submit_control_changes(
-        {
-            &#34;HeatSetpoint&#34;: temp,
-            &#34;StatusHeat&#34;: 1,
-            &#34;StatusCool&#34;: 1,
-            &#34;SystemSwitch&#34;: 1,
-            &#34;HeatNextPeriod&#34;: self._coerce_temp_end_to_setpoint(end),
-        }
-    )</code></pre>
-</details>
 </dd>
 <dt id="pyhtcc.pyhtcc.Zone.submit_control_changes"><code class="name flex">
 <span>def <span class="ident">submit_control_changes</span></span>(<span>self, data: dict) ‑> None</span>
@@ -2698,93 +1350,30 @@ OR
 <dd>
 <div class="desc"><p>This is a low-level API call to PyHTCC.submit_raw_control_changes().
 More likely than not, most users need not use this call directly.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def submit_control_changes(self, data: dict) -&gt; None:
-    &#34;&#34;&#34;
-    This is a low-level API call to PyHTCC.submit_raw_control_changes().
-    More likely than not, most users need not use this call directly.
-    &#34;&#34;&#34;
-    return self.pyhtcc.submit_raw_control_changes(self.device_id, data)</code></pre>
-</details>
 </dd>
 <dt id="pyhtcc.pyhtcc.Zone.turn_fan_auto"><code class="name flex">
 <span>def <span class="ident">turn_fan_auto</span></span>(<span>self) ‑> None</span>
 </code></dt>
 <dd>
 <div class="desc"><p>turns the fan to auto</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def turn_fan_auto(self) -&gt; None:
-    &#34;&#34;&#34;turns the fan to auto&#34;&#34;&#34;
-    logger.info(&#34;turning fan to auto&#34;)
-    return self.submit_control_changes(
-        {
-            &#34;FanMode&#34;: 0,
-        }
-    )</code></pre>
-</details>
 </dd>
 <dt id="pyhtcc.pyhtcc.Zone.turn_fan_circulate"><code class="name flex">
 <span>def <span class="ident">turn_fan_circulate</span></span>(<span>self) ‑> None</span>
 </code></dt>
 <dd>
 <div class="desc"><p>turns the fan to circulate</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def turn_fan_circulate(self) -&gt; None:
-    &#34;&#34;&#34;turns the fan to circulate&#34;&#34;&#34;
-    logger.info(&#34;turning fan circulate&#34;)
-    return self.submit_control_changes(
-        {
-            &#34;FanMode&#34;: 2,
-        }
-    )</code></pre>
-</details>
 </dd>
 <dt id="pyhtcc.pyhtcc.Zone.turn_fan_on"><code class="name flex">
 <span>def <span class="ident">turn_fan_on</span></span>(<span>self) ‑> None</span>
 </code></dt>
 <dd>
 <div class="desc"><p>turns the fan on</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def turn_fan_on(self) -&gt; None:
-    &#34;&#34;&#34;turns the fan on&#34;&#34;&#34;
-    logger.info(&#34;turning fan on&#34;)
-    return self.submit_control_changes(
-        {
-            &#34;FanMode&#34;: 1,
-        }
-    )</code></pre>
-</details>
 </dd>
 <dt id="pyhtcc.pyhtcc.Zone.turn_system_off"><code class="name flex">
 <span>def <span class="ident">turn_system_off</span></span>(<span>self) ‑> None</span>
 </code></dt>
 <dd>
 <div class="desc"><p>turns this thermostat off</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def turn_system_off(self) -&gt; None:
-    &#34;&#34;&#34;turns this thermostat off&#34;&#34;&#34;
-    logger.info(&#34;turning system off&#34;)
-    return self.submit_control_changes(
-        {
-            &#34;SystemSwitch&#34;: 2,
-        }
-    )</code></pre>
-</details>
 </dd>
 </dl>
 </dd>
@@ -2814,7 +1403,6 @@ More likely than not, most users need not use this call directly.</p></div>
 </section>
 </article>
 <nav id="sidebar">
-<h1>Index</h1>
 <div class="toc">
 <ul></ul>
 </div>
@@ -2936,7 +1524,7 @@ More likely than not, most users need not use this call directly.</p></div>
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.1</a>.</p>
 </footer>
 </body>
 </html>
