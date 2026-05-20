@@ -263,6 +263,59 @@ class TestPyHTCC:
         with pytest.raises(LoginUnexpectedError):
             self.pyhtcc._do_authenticate()
 
+    def test_set_location_id_single_location_via_url(self):
+        # Backward-compat: the most common case is the redirect putting the
+        # location id directly in the URL path. Make sure the existing
+        # behavior still works AND that `location_ids` is now populated.
+        result = FakeResult({}, url="https://mytotalconnectcomfort.com/portal/98765/")
+        self.pyhtcc._set_location_id_from_result(result)
+        assert self.pyhtcc._locationId == 98765
+        assert self.pyhtcc.location_ids == [98765]
+
+    def test_set_location_id_single_location_via_body_querystring(self):
+        # Older firmware fallback: URL doesn't carry the id but the body
+        # has a `locationId=<digits>` querystring somewhere.
+        class _Result:
+            url = "https://mytotalconnectcomfort.com/portal/SomeOtherPage"
+            text = 'href="/portal/Device/Something?locationId=54321&amp;deviceId=1"'
+
+        self.pyhtcc._set_location_id_from_result(_Result())
+        assert self.pyhtcc._locationId == 54321
+        assert self.pyhtcc.location_ids == [54321]
+
+    def test_set_location_id_multi_location_account(self):
+        # Reproducer for the original bug: accounts with more than one
+        # location land on /portal/Locations (a listing page) instead of
+        # /portal/<id>/. The id isn't in the URL OR a querystring — it's
+        # only present in /portal/<id> links in the listing body.
+        listing_body = """
+        <html><body>
+          <a href="/portal/3532155/Default.aspx">Hallway</a>
+          <a href="/portal/3532164/Default.aspx">Bedroom</a>
+        </body></html>
+        """
+
+        class _Result:
+            url = "https://mytotalconnectcomfort.com/portal/Locations"
+            text = listing_body
+
+        self.pyhtcc._set_location_id_from_result(_Result())
+        # Active location id = first id, sorted ascending.
+        assert self.pyhtcc._locationId == 3532155
+        # Full list available for callers that want to iterate.
+        assert self.pyhtcc.location_ids == [3532155, 3532164]
+
+    def test_set_location_id_raises_when_nothing_parseable(self):
+        # If the page contains neither a numeric path segment, nor a
+        # locationId querystring, nor any /portal/<digits> links, we
+        # raise LoginUnexpectedError instead of an opaque IndexError.
+        class _Result:
+            url = "https://mytotalconnectcomfort.com/portal/Surprise"
+            text = "<html><body>Hello world</body></html>"
+
+        with pytest.raises(LoginUnexpectedError):
+            self.pyhtcc._set_location_id_from_result(_Result())
+
     def test_get_zones_info(self):
         self.mock_zone_name_cache()
         self.mock_outdoor_weather(19, 56)
