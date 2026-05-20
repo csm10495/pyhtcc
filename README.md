@@ -20,6 +20,23 @@ zone.set_permanent_cool_setpoint(75)
 ```
 See [https://csm10495.github.io/pyhtcc/](https://csm10495.github.io/pyhtcc/) for full API documentation.
 
+## Multi-location accounts
+
+For TCC accounts that have more than one location (for example, two
+thermostats configured under separate "locations" in the TCC portal),
+login picks the first location id as the active one and exposes the
+full sorted list on `client.location_ids`. To work with a different
+location, set `_locationId` before any per-location call:
+
+```
+p = PyHTCC(<TCC username>, <TCC password>)
+print(p.location_ids)        # e.g. [3532155, 3532164]
+
+# Work with location 3532164's zones:
+p._locationId = 3532164
+zones = p.get_all_zones()
+```
+
 # CLI Syntax
 
 <!-- MARKDOWN-AUTO-DOCS:START (CODE:src=./help_output.txt) -->

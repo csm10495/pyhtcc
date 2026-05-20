@@ -592,17 +592,58 @@ class PyHTCC:
 
     def _set_location_id_from_result(self, result):
         """
-        Attempts to find the location id first from the url then if that fails, in the result's text content
+        Attempts to find the location id first from the url then if that fails, in the result's text content.
+
+        For accounts with more than one location, TCC redirects to
+        ``/portal/Locations`` (a listing page) instead of the single-location
+        ``/portal/<locationId>/...`` URL. In that case we scrape the location
+        ids from the ``/portal/<digits>`` links in the listing page; the first
+        one becomes the active ``_locationId`` and the full sorted list is
+        kept on ``self.location_ids`` so callers can iterate.
         """
+        # Single-location accounts: location id is the path segment after
+        # /portal/.
         try:
             self._locationId = int(result.url.split("portal/")[1].split("/")[0])
+            self.location_ids = [self._locationId]
+            logger.debug(f"location id is {self._locationId}")
+            return
         except ValueError:
             logger.debug(
                 "Unable to grab location id via url... checking content instead"
             )
-            self._locationId = int(re.findall(r"locationId=(\d+)", result.text)[0])
 
-        logger.debug(f"location id is {self._locationId}")
+        # Some older firmwares put the location id in a querystring inside
+        # the body. Try that next.
+        match = re.findall(r"locationId=(\d+)", result.text)
+        if match:
+            self._locationId = int(match[0])
+            self.location_ids = [self._locationId]
+            logger.debug(f"location id is {self._locationId}")
+            return
+
+        # Multi-location accounts land on /portal/Locations, which lists
+        # each location as a link to /portal/<locationId>. Pull every
+        # numeric segment, dedupe, sort.
+        ids = sorted({int(i) for i in re.findall(r"/portal/(\d+)", result.text)})
+        if not ids:
+            raise LoginUnexpectedError(
+                "Couldn't parse a location id from the post-login response. "
+                "The TCC site layout may have changed."
+            )
+
+        self.location_ids = ids
+        self._locationId = ids[0]
+        if len(ids) > 1:
+            logger.info(
+                f"TCC account has {len(ids)} locations: {ids}. "
+                f"Active location id is {self._locationId}; the full list is "
+                f"on `client.location_ids`. To work with another location, "
+                f"set `client._locationId = <id>` before calling "
+                f"get_zones_info / get_all_zones / etc."
+            )
+        else:
+            logger.debug(f"location id is {self._locationId}")
 
     @functools.lru_cache(maxsize=None)
     @_ensure_session
